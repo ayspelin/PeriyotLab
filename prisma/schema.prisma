@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  category    String
+  hazardLevel String?  // Optional field, as not all products might have a hazard level
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model HeroSlide {
+  id          String   @id @default(uuid())
+  imageUrl    String
+  title       String?
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model SiteSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+}
