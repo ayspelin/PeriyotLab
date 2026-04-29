@@ -29,7 +29,7 @@ export default async function AdminProductsPage() {
             <tr>
               <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Ürün Adı</th>
               <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Kategori</th>
-              <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Tehlike Seviyesi</th>
+              <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Görsel</th>
               <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs text-right">İşlemler</th>
             </tr>
           </thead>
@@ -39,12 +39,17 @@ export default async function AdminProductsPage() {
                 <td className="px-6 py-4 font-medium text-slate-900">{product.name}</td>
                 <td className="px-6 py-4 text-slate-500">{product.category}</td>
                 <td className="px-6 py-4">
-                  {product.hazardLevel && (
-                    <span className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700 rounded-md">{product.hazardLevel}</span>
+                  {product.imageUrl ? (
+                    <img src={product.imageUrl} alt={product.name} className="w-10 h-10 object-cover rounded border border-slate-200" />
+                  ) : (
+                    <span className="text-slate-400 text-xs italic">Yok</span>
                   )}
                 </td>
-                <td className="px-6 py-4 text-right">
-                  <DeleteProductButton id={product.id} />
+                <td className="px-6 py-4">
+                  <div className="flex items-center justify-end gap-3">
+                    <Link href={`/admin/products/${product.id}/edit`} className="text-blue-500 font-bold hover:underline uppercase text-xs tracking-wider">Düzenle</Link>
+                    <DeleteProductButton id={product.id} />
+                  </div>
                 </td>
               </tr>
             ))}

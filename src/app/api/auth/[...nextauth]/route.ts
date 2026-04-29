@@ -1,5 +1,11 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import bcrypt from 'bcryptjs';
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 const handler = NextAuth({
   providers: [
@@ -10,14 +16,27 @@ const handler = NextAuth({
         password: { label: "Şifre", type: "password" }
       },
       async authorize(credentials) {
-        const { email, password } = credentials ?? {};
+        if (!credentials?.email || !credentials?.password) return null;
+
+        // .env yedeği (Super Admin)
         if (
-          email === process.env.ADMIN_EMAIL &&
-          password === process.env.ADMIN_PASSWORD
+          credentials.email === process.env.ADMIN_EMAIL &&
+          credentials.password === process.env.ADMIN_PASSWORD
         ) {
-          return { id: "1", name: "Admin", email: email };
+          return { id: "0", name: "Super Admin", email: credentials.email };
         }
-        return null;
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email }
+        });
+
+        if (!user) return null;
+
+        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+
+        if (!isPasswordValid) return null;
+
+        return { id: user.id, name: user.name || "Admin", email: user.email };
       }
     })
   ],

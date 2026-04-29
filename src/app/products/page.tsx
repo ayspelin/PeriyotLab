@@ -19,10 +19,10 @@ export default async function ProductsPage() {
     console.error("Database connection error:", error);
     // Mock data for UI presentation until DB is successfully connected
     products = [
-      { id: '1', name: 'Sodyum Klorür', description: 'Laboratuvar analizi için yüksek saflıkta sodyum klorür. Standart referans materyali.', category: 'Tuzlar', hazardLevel: 'Düşük' },
-      { id: '2', name: 'Hidroklorik Asit %37', description: 'Analitik reaktif kalite hidroklorik asit. Titrasyon ve genel asit-baz reaksiyonları için.', category: 'Asitler', hazardLevel: 'Korozif' },
-      { id: '3', name: 'Etanol Mutlak', description: '%99.9 saflıkta etil alkol. Çözücü olarak ve kromatografik analizlerde kullanıma uygundur.', category: 'Çözücüler', hazardLevel: 'Yanıcı' },
-      { id: '4', name: 'Potasyum Permanganat', description: 'Güçlü oksitleyici ajan. Su arıtma analizleri ve redoks titrasyonları için.', category: 'Oksitleyiciler', hazardLevel: 'Tahriş Edici' },
+      { id: '1', name: 'Sodyum Klorür', description: 'Laboratuvar analizi için yüksek saflıkta sodyum klorür. Standart referans materyali.', category: 'Tuzlar', imageUrl: null },
+      { id: '2', name: 'Hidroklorik Asit %37', description: 'Analitik reaktif kalite hidroklorik asit. Titrasyon ve genel asit-baz reaksiyonları için.', category: 'Asitler', imageUrl: null },
+      { id: '3', name: 'Etanol Mutlak', description: '%99.9 saflıkta etil alkol. Çözücü olarak ve kromatografik analizlerde kullanıma uygundur.', category: 'Çözücüler', imageUrl: null },
+      { id: '4', name: 'Potasyum Permanganat', description: 'Güçlü oksitleyici ajan. Su arıtma analizleri ve redoks titrasyonları için.', category: 'Oksitleyiciler', imageUrl: null },
     ];
   }
 

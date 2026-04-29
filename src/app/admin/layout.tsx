@@ -37,6 +37,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin/hero-slides" className="flex items-center px-6 py-3 text-slate-400 hover:text-white hover:bg-slate-800 border-l-4 border-transparent transition-colors text-sm font-medium">
             🖼️ Banner Yönetimi
           </Link>
+          <Link href="/admin/about" className="flex items-center px-6 py-3 text-slate-400 hover:text-white hover:bg-slate-800 border-l-4 border-transparent transition-colors text-sm font-medium">
+            📝 Hakkımızda Yönetimi
+          </Link>
           <Link href="/admin/settings" className="flex items-center px-6 py-3 text-slate-400 hover:text-white hover:bg-slate-800 border-l-4 border-transparent transition-colors text-sm font-medium">
             ⚙️ Site Ayarları
           </Link>

@@ -1,24 +1,56 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function NewProductPage() {
+export default function EditProductPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+  
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: '',
+    imageUrl: null as string | null
   });
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch(`/api/products/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setFormData({
+            name: data.name,
+            description: data.description,
+            category: data.category,
+            imageUrl: data.imageUrl
+          });
+        } else {
+          alert("Ürün bulunamadı");
+          router.push('/admin');
+        }
+      } catch (error) {
+        console.error("Fetch error", error);
+      } finally {
+        setFetching(false);
+      }
+    };
+    if (id) fetchProduct();
+  }, [id, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      let imageUrl = null;
+      let finalImageUrl = formData.imageUrl;
+      
+      // Upload new image if selected
       if (imageFile) {
         const uploadData = new FormData();
         uploadData.append('file', imageFile);
@@ -28,7 +60,7 @@ export default function NewProductPage() {
         });
         if (uploadRes.ok) {
           const uploadResult = await uploadRes.json();
-          imageUrl = uploadResult.url;
+          finalImageUrl = uploadResult.url;
         } else {
           alert("Resim yüklenirken hata oluştu.");
           setLoading(false);
@@ -36,16 +68,16 @@ export default function NewProductPage() {
         }
       }
 
-      const res = await fetch('/api/products', {
-        method: 'POST',
+      const res = await fetch(`/api/products/${id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, imageUrl })
+        body: JSON.stringify({ ...formData, imageUrl: finalImageUrl })
       });
       if (res.ok) {
         router.push('/admin');
         router.refresh();
       } else {
-        alert("Ürün eklenirken sunucu hatası oluştu.");
+        alert("Ürün güncellenirken sunucu hatası oluştu.");
       }
     } catch (error) {
       alert("Bir hata oluştu. Bağlantınızı kontrol edin.");
@@ -54,13 +86,15 @@ export default function NewProductPage() {
     }
   };
 
+  if (fetching) return <div className="p-8">Yükleniyor...</div>;
+
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
         <Link href="/admin" className="text-sm font-semibold text-slate-500 hover:text-blue-500 transition-colors flex items-center gap-2">
           ← Geri Dön
         </Link>
-        <h1 className="text-2xl font-bold mt-4 text-slate-900">Yeni Ürün Ekle</h1>
+        <h1 className="text-2xl font-bold mt-4 text-slate-900">Ürünü Düzenle</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white p-8 border border-slate-200 rounded-lg shadow-sm space-y-6">
@@ -78,7 +112,10 @@ export default function NewProductPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Ürün Görseli</label>
+            <label className="text-sm font-medium text-slate-700">Ürün Görseli (Değiştirmek isterseniz seçin)</label>
+            {formData.imageUrl && !imageFile && (
+               <img src={formData.imageUrl} alt="Mevcut Görsel" className="h-12 w-12 object-cover rounded mb-2" />
+            )}
             <input type="file" accept="image/*" className="w-full p-2 bg-white border border-slate-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors text-slate-900"
               onChange={e => setImageFile(e.target.files ? e.target.files[0] : null)} />
           </div>
@@ -91,7 +128,7 @@ export default function NewProductPage() {
         </div>
 
         <button type="submit" disabled={loading} className="w-full py-3 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition-colors disabled:opacity-50 mt-4">
-          {loading ? 'Ekleniyor...' : 'Ürünü Kaydet'}
+          {loading ? 'Güncelleniyor...' : 'Değişiklikleri Kaydet'}
         </button>
       </form>
     </div>

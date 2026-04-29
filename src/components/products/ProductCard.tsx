@@ -6,7 +6,7 @@ interface ProductCardProps {
     name: string;
     description: string;
     category: string;
-    hazardLevel: string | null;
+    imageUrl: string | null;
   };
 }
 
@@ -14,17 +14,18 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link href={`/products/${product.id}`} className="block group h-full">
       <div className="bg-white border border-zinc-200 rounded-2xl p-6 h-full flex flex-col hover:border-black hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-black relative overflow-hidden">
-        
+        {/* Image */}
+        {product.imageUrl && (
+          <div className="mb-6 -mx-6 -mt-6">
+            <img src={product.imageUrl} alt={product.name} className="w-full h-48 object-cover" />
+          </div>
+        )}
+
         {/* Top Badges */}
         <div className="flex justify-between items-start mb-6">
           <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full">
             {product.category}
           </span>
-          {product.hazardLevel && (
-            <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-zinc-900 text-white border border-black rounded-full">
-              {product.hazardLevel}
-            </span>
-          )}
         </div>
         
         {/* Content */}

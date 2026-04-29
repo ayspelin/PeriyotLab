@@ -14,7 +14,7 @@ model Product {
   name        String
   description String
   category    String
-  hazardLevel String?  // Optional field, as not all products might have a hazard level
+  imageUrl    String?  // Optional field for product image
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -32,4 +32,12 @@ model SiteSetting {
   id    String @id @default(uuid())
   key   String @unique
   value String
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
 }

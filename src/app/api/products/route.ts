@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         name: body.name,
         description: body.description,
         category: body.category,
-        hazardLevel: body.hazardLevel || null,
+        imageUrl: body.imageUrl || null,
       }
     });
     return NextResponse.json(product, { status: 201 });

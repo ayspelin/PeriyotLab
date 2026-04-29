@@ -30,12 +30,13 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
       <div className="border border-gray-200 dark:border-gray-800 p-8 md:p-12 group">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <span className="text-sm font-bold uppercase tracking-widest text-gray-500">{product.category}</span>
-          {product.hazardLevel && (
-            <span className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-foreground">
-              Tehlike Seviyesi: {product.hazardLevel}
-            </span>
-          )}
         </div>
+        
+        {product.imageUrl && (
+          <div className="mb-8 overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800">
+            <img src={product.imageUrl} alt={product.name} className="w-full max-h-[400px] object-cover" />
+          </div>
+        )}
         
         <h1 className="text-4xl md:text-5xl font-bold mb-8">{product.name}</h1>
         

@@ -4,10 +4,12 @@ import { useState } from 'react';
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setErrorMessage('');
     
     try {
       const res = await fetch('/api/contact', {
@@ -22,9 +24,11 @@ export default function ContactPage() {
         setFormData({ name: '', email: '', message: '' });
       } else {
         setStatus('error');
+        setErrorMessage(data.error || 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
       }
     } catch (e) {
       setStatus('error');
+      setErrorMessage('Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
 
@@ -49,7 +53,7 @@ export default function ContactPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-8">
               {status === 'error' && (
-                <div className="p-4 bg-red-50 text-red-800 border border-red-200 text-sm">Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.</div>
+                <div className="p-4 bg-red-50 text-red-800 border border-red-200 text-sm">{errorMessage}</div>
               )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <div className="space-y-3">
