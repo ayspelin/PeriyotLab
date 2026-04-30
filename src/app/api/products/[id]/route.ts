@@ -27,6 +27,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         description: body.description,
         category: body.category,
         imageUrl: body.imageUrl !== undefined ? body.imageUrl : undefined,
+        documentUrl: body.documentUrl !== undefined ? body.documentUrl : undefined,
+        documentTitle: body.documentTitle !== undefined ? body.documentTitle : undefined,
+        documentType: body.documentType !== undefined ? body.documentType : undefined,
       }
     });
     return NextResponse.json(product);

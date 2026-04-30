@@ -1,6 +1,7 @@
 import HeroSlider from "@/components/home/HeroSlider";
 import Link from "next/link";
 import ProductCard from "@/components/products/ProductCard";
+import PartnersSection from "@/components/home/PartnersSection";
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
@@ -10,12 +11,16 @@ const prisma = new PrismaClient({ adapter });
 export default async function Home() {
   let featuredProducts: any[] = [];
   let heroSlides: any[] = [];
+  let partners: any[] = [];
   try {
     featuredProducts = await prisma.product.findMany({
       take: 4,
       orderBy: { createdAt: 'desc' }
     });
     heroSlides = await prisma.heroSlide.findMany({
+      orderBy: { order: 'asc' }
+    });
+    partners = await prisma.partner.findMany({
       orderBy: { order: 'asc' }
     });
   } catch (e) {
@@ -104,6 +109,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Partners Section */}
+      <PartnersSection partners={partners} />
 
       {/* Short Company Intro */}
       <section className="py-24 bg-black text-white relative overflow-hidden">
