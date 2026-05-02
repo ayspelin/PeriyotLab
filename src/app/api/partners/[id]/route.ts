@@ -6,9 +6,9 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 // PUT: Update a partner
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { name, imageUrl, order } = body;
 
@@ -29,9 +29,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // DELETE: Delete a partner
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await prisma.partner.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -39,3 +39,4 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: 'Failed to delete partner' }, { status: 500 });
   }
 }
+

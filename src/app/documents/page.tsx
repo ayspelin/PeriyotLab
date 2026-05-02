@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
@@ -78,6 +80,19 @@ export const metadata = {
   description: 'PeriyotLab teknik dökümanları, kataloglar ve belgeler.',
 };
 
+async function getSettings() {
+  try {
+    const settings = await prisma.siteSetting.findMany({
+      where: { key: { in: ['docs_page_badge', 'docs_page_title', 'docs_page_description'] } },
+    });
+    const map: Record<string, string> = {};
+    settings.forEach((s) => { map[s.key] = s.value; });
+    return map;
+  } catch {
+    return {};
+  }
+}
+
 export default async function DocumentsPage() {
   let documents: any[] = [];
   try {
@@ -87,6 +102,11 @@ export default async function DocumentsPage() {
   } catch (e) {
     console.error('Error fetching documents:', e);
   }
+
+  const settings = await getSettings();
+  const badge = settings['docs_page_badge'] || 'Kaynaklar';
+  const title = settings['docs_page_title'] || 'Dökümanlar';
+  const description = settings['docs_page_description'] || 'Teknik dökümanlar, ürün katalogları ve belgelerimizi inceleyip indirebilirsiniz.';
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
@@ -101,13 +121,13 @@ export default async function DocumentsPage() {
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs font-bold uppercase tracking-widest mb-6">
-            Kaynaklar
+            {badge}
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
-            Dökümanlar
+            {title}
           </h1>
           <p className="text-zinc-400 text-lg max-w-xl">
-            Teknik dökümanlar, ürün katalogları ve belgelerimizi inceleyip indirebilirsiniz.
+            {description}
           </p>
         </div>
       </section>

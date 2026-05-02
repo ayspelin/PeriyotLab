@@ -5,23 +5,26 @@ import { PrismaPg } from '@prisma/adapter-pg';
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const doc = await prisma.document.findUnique({ where: { id: params.id } });
+    const { id } = await params;
+    const doc = await prisma.document.findUnique({ where: { id } });
     if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json(doc);
   } catch (error) {
+    console.error('Error fetching document:', error);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { title, description, fileUrl, fileType, coverImageUrl, order } = body;
 
     const document = await prisma.document.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(title !== undefined && { title }),
         ...(description !== undefined && { description }),
@@ -39,12 +42,14 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await prisma.document.delete({ where: { id: params.id } });
+    const { id } = await params;
+    await prisma.document.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting document:', error);
     return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });
   }
 }
+
