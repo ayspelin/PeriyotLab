@@ -1,11 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
 import ContactClient from './ContactClient';
+import prisma from "@/lib/prisma";
+
 
 export const dynamic = 'force-dynamic';
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
 
 export default async function ContactPage() {
   let settings: Record<string, string> = {};

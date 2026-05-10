@@ -1,8 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
+import prisma from "@/lib/prisma";
 
 export const revalidate = 0; // Disable static caching so it updates immediately when changed in admin
 

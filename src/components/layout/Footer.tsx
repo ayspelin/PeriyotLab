@@ -1,9 +1,5 @@
 import Link from 'next/link';
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
+import prisma from "@/lib/prisma";
 
 export default async function Footer() {
   let footerText = "Modern Endüstri İçin Gelişmiş Kimyasal Çözümler";

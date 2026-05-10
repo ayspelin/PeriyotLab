@@ -1,10 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
 import Link from 'next/link';
-import DeleteProductButton from '@/components/admin/DeleteProductButton';
+import prisma from "@/lib/prisma";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
+import DeleteProductButton from '@/components/admin/DeleteProductButton';
 
 export default async function AdminProductsPage() {
   const products = await prisma.product.findMany({

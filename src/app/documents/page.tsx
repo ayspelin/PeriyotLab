@@ -1,13 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
 import Link from 'next/link';
+import prisma from "@/lib/prisma";
+import React from "react";
 
 export const dynamic = 'force-dynamic';
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
-
-const FILE_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; icon: JSX.Element }> = {
+const FILE_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; icon: React.ReactNode }> = {
   pdf: {
     label: 'PDF',
     color: '#dc2626',

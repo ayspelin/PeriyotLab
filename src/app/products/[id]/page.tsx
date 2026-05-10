@@ -1,10 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import prisma from "@/lib/prisma";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
+import { notFound } from 'next/navigation';
 
 const FILE_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
   pdf:   { label: 'PDF',   color: '#dc2626', bg: '#fef2f2', border: '#fecaca', icon: '📄' },

@@ -1,9 +1,6 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
 import ProductCard from '@/components/products/ProductCard';
+import prisma from "@/lib/prisma";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
 
 export default async function ProductsPage() {
   let products: any[] = [];

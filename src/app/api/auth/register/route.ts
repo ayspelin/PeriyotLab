@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import bcrypt from 'bcryptjs';
+import prisma from "@/lib/prisma";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
   try {

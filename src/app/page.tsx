@@ -1,13 +1,9 @@
 import HeroSlider from "@/components/home/HeroSlider";
+import prisma from "@/lib/prisma";
+
 import Link from "next/link";
 import ProductCard from "@/components/products/ProductCard";
 import PartnersSection from "@/components/home/PartnersSection";
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
-
 export default async function Home() {
   let featuredProducts: any[] = [];
   let heroSlides: any[] = [];
