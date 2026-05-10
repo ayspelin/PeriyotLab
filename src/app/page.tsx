@@ -8,9 +8,10 @@ export default async function Home() {
   let featuredProducts: any[] = [];
   let heroSlides: any[] = [];
   let partners: any[] = [];
+  let settings: Record<string, string> = {};
   try {
     featuredProducts = await prisma.product.findMany({
-      take: 4,
+      where: { isFeatured: true },
       orderBy: { createdAt: 'desc' }
     });
     heroSlides = await prisma.heroSlide.findMany({
@@ -19,6 +20,17 @@ export default async function Home() {
     partners = await prisma.partner.findMany({
       orderBy: { order: 'asc' }
     });
+    const siteSettings = await prisma.siteSetting.findMany({
+      where: {
+        key: {
+          in: ['home_vision_title', 'home_vision_desc']
+        }
+      }
+    });
+    siteSettings.forEach(s => {
+      if (s.key === 'home_vision_title') settings.home_vision_title = s.value;
+      if (s.key === 'home_vision_desc') settings.home_vision_desc = s.value;
+    });
   } catch (e) {
     console.error("Database error in Home:", e);
   }
@@ -26,50 +38,9 @@ export default async function Home() {
   return (
     <div className="flex flex-col w-full bg-[#f8f9fa]">
       
-      {/* Premium Hero Section - Monochrome */}
-      <section className="relative w-full min-h-[85vh] flex flex-col lg:flex-row items-center justify-between container mx-auto px-4 py-12 lg:py-0 gap-12 overflow-hidden bg-[#f8f9fa]">
-        
-        {/* Left Side: Typography & CTA */}
-        <div className="w-full lg:w-1/2 flex flex-col justify-center z-20 relative pt-10 lg:pt-0">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-black leading-[1.1] mb-6 tracking-tight">
-            Modern Endüstri İçin <br/> 
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-black to-zinc-500">
-              Gelişmiş Çözümler
-            </span>
-          </h1>
-          
-          <p className="text-zinc-500 text-lg md:text-xl mb-10 max-w-lg leading-relaxed">
-            Üst düzey kimyasal maddeleri güvenle incelemek ve tedarik etmek için kapsamlı, yeni nesil dijital platform.
-          </p>
-          
-          <div className="flex flex-wrap gap-4">
-            <Link href="/products" className="inline-flex items-center justify-center px-8 py-4 text-sm font-bold tracking-wide text-white bg-black hover:bg-zinc-800 hover:shadow-lg hover:-translate-y-0.5 rounded-full transition-all">
-              Ürünleri İncele
-            </Link>
-            <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 text-sm font-bold tracking-wide text-black bg-white border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm rounded-full transition-all">
-              Bize Ulaşın
-            </Link>
-          </div>
-        </div>
-
-        {/* Right Side: Floating Slider */}
-        <div className="w-full lg:w-1/2 h-[400px] md:h-[500px] lg:h-[600px] relative z-10 flex items-center justify-center">
-          {/* Decorative SVG Spiral Background instead of blur blob */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] z-0 opacity-5 pointer-events-none text-black">
-            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.5">
-              <path d="M50 0 A50 50 0 1 1 49.9 0" />
-              <path d="M50 10 A40 40 0 1 1 49.9 10" />
-              <path d="M50 20 A30 30 0 1 1 49.9 20" />
-              <path d="M50 30 A20 20 0 1 1 49.9 30" />
-              <path d="M50 40 A10 10 0 1 1 49.9 40" />
-            </svg>
-          </div>
-          
-          {/* The Slider Container */}
-          <div className="relative w-full h-full max-h-[600px] rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white z-10">
-            <HeroSlider slides={heroSlides} />
-          </div>
-        </div>
+      {/* Premium Full-Width Hero Section */}
+      <section className="relative w-full h-[70vh] min-h-[500px] lg:h-[85vh] overflow-hidden bg-black">
+        <HeroSlider slides={heroSlides} />
       </section>
 
       {/* Featured Products */}
@@ -124,9 +95,11 @@ export default async function Home() {
           <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs font-bold uppercase tracking-widest mb-8">
             Vizyonumuz
           </div>
-          <h2 className="text-4xl md:text-5xl font-extrabold mb-8 tracking-tight text-white leading-tight">Laboratuvar Standartlarını Yükseltiyoruz</h2>
+          <h2 className="text-4xl md:text-5xl font-extrabold mb-8 tracking-tight text-white leading-tight">
+            {settings.home_vision_title || 'Laboratuvar Standartlarını Yükseltiyoruz'}
+          </h2>
           <p className="text-xl text-zinc-400 leading-relaxed mb-12 max-w-3xl mx-auto">
-            PeriyotLab olarak, endüstriyel ve analitik laboratuvarların ihtiyaç duyduğu en yüksek saflıkta kimyasal bileşenleri sağlıyoruz. Güvenlik, kalite ve sürdürülebilirlik odaklı yaklaşımımızla sektörde fark yaratıyoruz.
+            {settings.home_vision_desc || 'PeriyotLab olarak, endüstriyel ve analitik laboratuvarların ihtiyaç duyduğu en yüksek saflıkta kimyasal bileşenleri sağlıyoruz. Güvenlik, kalite ve sürdürülebilirlik odaklı yaklaşımımızla sektörde fark yaratıyoruz.'}
           </p>
           <Link href="/about" className="inline-flex px-8 py-4 bg-white text-black rounded-full font-bold text-sm tracking-wide hover:bg-zinc-200 hover:shadow-lg hover:-translate-y-1 transition-all">
             Hakkımızda Daha Fazla Bilgi

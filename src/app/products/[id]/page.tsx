@@ -97,20 +97,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
           </div>
         )}
 
-        {/* System Info */}
-        <div className="border-t border-gray-200 dark:border-gray-800 pt-8">
-          <h3 className="text-sm font-bold uppercase tracking-widest mb-4">Sistem Bilgileri</h3>
-          <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-400 max-w-xs">
-            <li className="flex justify-between border-b border-gray-100 dark:border-gray-900 pb-2">
-              <span>Sistem ID Kodu</span>
-              <span className="font-mono text-foreground">{product.id.split('-')[0].toUpperCase()}</span>
-            </li>
-            <li className="flex justify-between border-b border-gray-100 dark:border-gray-900 pb-2">
-              <span>Kayıt Tarihi</span>
-              <span className="font-mono text-foreground">{product.createdAt.toLocaleDateString('tr-TR')}</span>
-            </li>
-          </ul>
-        </div>
+
       </div>
     </div>
   );

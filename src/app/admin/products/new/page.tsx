@@ -31,6 +31,7 @@ export default function NewProductPage() {
     description: '',
     category: '',
     documentTitle: '',
+    isFeatured: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,6 +138,13 @@ export default function NewProductPage() {
             <textarea required rows={4}
               className="w-full p-3 bg-white border border-slate-300 rounded-lg focus:border-black focus:ring-1 focus:ring-black outline-none transition-colors text-slate-900 text-sm resize-none"
               value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+          </div>
+
+          <div className="flex items-center space-x-3 mt-4">
+            <input type="checkbox" id="isFeatured"
+              className="w-4 h-4 text-black border-slate-300 rounded focus:ring-black"
+              checked={formData.isFeatured} onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })} />
+            <label htmlFor="isFeatured" className="text-sm font-medium text-slate-700">Anasayfada Göster (Öne Çıkan Ürün)</label>
           </div>
         </div>
 

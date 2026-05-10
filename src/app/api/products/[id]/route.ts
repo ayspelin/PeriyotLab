@@ -26,11 +26,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         documentUrl: body.documentUrl !== undefined ? body.documentUrl : undefined,
         documentTitle: body.documentTitle !== undefined ? body.documentTitle : undefined,
         documentType: body.documentType !== undefined ? body.documentType : undefined,
+        isFeatured: body.isFeatured !== undefined ? body.isFeatured : undefined,
       }
     });
     return NextResponse.json(product);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+  } catch (error: any) {
+    console.error("PUT Error:", error);
+    return NextResponse.json({ error: "Failed to update product", details: error.message }, { status: 500 });
   }
 }
 

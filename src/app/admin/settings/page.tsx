@@ -12,6 +12,8 @@ export default function SettingsAdmin() {
     docs_page_badge: '',
     docs_page_title: '',
     docs_page_description: '',
+    home_vision_title: '',
+    home_vision_desc: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -99,6 +101,22 @@ export default function SettingsAdmin() {
             <textarea rows={3} className="w-full p-3 bg-white border border-slate-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-slate-900 resize-none"
               value={settings.docs_page_description} onChange={e => setSettings({...settings, docs_page_description: e.target.value})}
               placeholder="Teknik dökümanlar, ürün katalogları ve belgelerimizi inceleyip indirebilirsiniz." />
+          </div>
+        </div>
+
+        <h2 className="text-lg font-semibold border-b border-slate-200 pb-2 mb-4 mt-8 text-slate-800">Anasayfa Vizyon Bölümü</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Başlık</label>
+            <input type="text" className="w-full p-3 bg-white border border-slate-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-slate-900"
+              value={settings.home_vision_title} onChange={e => setSettings({...settings, home_vision_title: e.target.value})}
+              placeholder="Laboratuvar Standartlarını Yükseltiyoruz" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Açıklama</label>
+            <textarea rows={3} className="w-full p-3 bg-white border border-slate-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-slate-900 resize-none"
+              value={settings.home_vision_desc} onChange={e => setSettings({...settings, home_vision_desc: e.target.value})}
+              placeholder="PeriyotLab olarak..." />
           </div>
         </div>
 

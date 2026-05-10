@@ -44,9 +44,23 @@ export default function HeroSlider({ slides }: HeroSliderProps) {
             src={slide.imageUrl}
             alt={slide.title || `Laboratuvar Görseli ${index + 1}`}
             fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"
             priority={index === 0}
           />
+          {/* Gradient overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-8 md:p-12 pb-20">
+            {slide.title && (
+              <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold mb-4 drop-shadow-md">
+                {slide.title}
+              </h2>
+            )}
+            {slide.description && (
+              <p className="text-white/90 text-lg md:text-xl max-w-xl drop-shadow-md leading-relaxed">
+                {slide.description}
+              </p>
+            )}
+          </div>
         </div>
       ))}
 

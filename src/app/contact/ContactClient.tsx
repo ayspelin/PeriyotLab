@@ -111,6 +111,22 @@ export default function ContactClient({ settings }: Props) {
             <h3 className="text-xs font-bold uppercase tracking-widest mb-3 text-gray-500">Çalışma Saatleri</h3>
             <p className="font-medium text-lg leading-relaxed whitespace-pre-line">{workingHours}</p>
           </div>
+          
+          <div className="pt-6 border-t border-gray-200 dark:border-gray-800">
+            <h3 className="text-xs font-bold uppercase tracking-widest mb-4 text-gray-500">Konum</h3>
+            <div className="w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3008.2046808796845!2d28.986861515415714!3d41.06456097929424!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab6f30a905ccb%3A0xc68297753c1afefc!2sLevent%2C%20Be%C5%9Fikta%C5%9F%2F%C4%B0stanbul!5e0!3m2!1str!2str!4v1682855554444!5m2!1str!2str" 
+                width="100%" 
+                height="100%" 
+                style={{ border: 0 }} 
+                allowFullScreen={true} 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Google Maps"
+              ></iframe>
+            </div>
+          </div>
         </div>
       </div>
     </div>

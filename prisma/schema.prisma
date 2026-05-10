@@ -18,6 +18,7 @@ model Product {
   documentUrl     String?  // Optional attached document (PDF, Excel, Word etc.)
   documentTitle   String?  // Display name for the document
   documentType    String?  // pdf | xlsx | docx | pptx | other
+  isFeatured      Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -38,11 +39,13 @@ model SiteSetting {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
+  id               String    @id @default(uuid())
+  email            String    @unique
+  password         String
+  name             String?
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
 }
 
 model Partner {

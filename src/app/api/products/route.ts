@@ -24,6 +24,7 @@ export async function POST(request: Request) {
         documentUrl: body.documentUrl || null,
         documentTitle: body.documentTitle || null,
         documentType: body.documentType || null,
+        isFeatured: body.isFeatured || false,
       }
     });
     return NextResponse.json(product, { status: 201 });
