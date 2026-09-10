@@ -1,9 +1,16 @@
 import ProductCard from '@/components/products/ProductCard';
 import prisma from "@/lib/prisma";
 
+type ProductListItem = {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  imageUrl: string | null;
+};
 
 export default async function ProductsPage() {
-  let products: any[] = [];
+  let products: ProductListItem[] = [];
   let dbError = false;
 
   try {
@@ -11,15 +18,13 @@ export default async function ProductsPage() {
     products = await prisma.product.findMany({
       orderBy: { createdAt: 'desc' }
     });
-  } catch (error) {
+  } catch {
     dbError = true;
-    console.error("Database connection error:", error);
-    // Mock data for UI presentation until DB is successfully connected
     products = [
-      { id: '1', name: 'Sodyum Klorür', description: 'Laboratuvar analizi için yüksek saflıkta sodyum klorür. Standart referans materyali.', category: 'Tuzlar', imageUrl: null },
-      { id: '2', name: 'Hidroklorik Asit %37', description: 'Analitik reaktif kalite hidroklorik asit. Titrasyon ve genel asit-baz reaksiyonları için.', category: 'Asitler', imageUrl: null },
-      { id: '3', name: 'Etanol Mutlak', description: '%99.9 saflıkta etil alkol. Çözücü olarak ve kromatografik analizlerde kullanıma uygundur.', category: 'Çözücüler', imageUrl: null },
-      { id: '4', name: 'Potasyum Permanganat', description: 'Güçlü oksitleyici ajan. Su arıtma analizleri ve redoks titrasyonları için.', category: 'Oksitleyiciler', imageUrl: null },
+      { id: 'fallback-sodium-chloride', name: 'Sodyum Klorür', description: 'Laboratuvar analizi için yüksek saflıkta sodyum klorür. Standart referans materyali.', category: 'Tuzlar', imageUrl: '/mock/prod1.png' },
+      { id: 'fallback-hydrochloric-acid', name: 'Hidroklorik Asit %37', description: 'Analitik reaktif kalite hidroklorik asit. Titrasyon ve genel asit-baz reaksiyonları için.', category: 'Asitler', imageUrl: '/mock/prod2.png' },
+      { id: 'fallback-ethanol', name: 'Etanol Mutlak', description: '%99.9 saflıkta etil alkol. Çözücü olarak ve kromatografik analizlerde kullanıma uygundur.', category: 'Çözücüler', imageUrl: '/mock/prod3.png' },
+      { id: 'fallback-potassium-permanganate', name: 'Potasyum Permanganat', description: 'Güçlü oksitleyici ajan. Su arıtma analizleri ve redoks titrasyonları için.', category: 'Oksitleyiciler', imageUrl: '/mock/prod4.png' },
     ];
   }
 

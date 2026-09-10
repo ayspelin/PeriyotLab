@@ -14,11 +14,11 @@ function getFileType(mimeType: string): string {
 }
 
 function getDocIcon(type: string | null) {
-  if (type === 'pdf') return '📄';
-  if (type === 'xlsx') return '📊';
-  if (type === 'docx') return '📝';
-  if (type === 'pptx') return '📋';
-  return '📎';
+  if (type === 'pdf') return 'PDF';
+  if (type === 'xlsx') return 'XLS';
+  if (type === 'docx') return 'DOC';
+  if (type === 'pptx') return 'PPT';
+  return 'DOSYA';
 }
 
 export default function EditProductPage() {
@@ -60,7 +60,7 @@ export default function EditProductPage() {
           });
         } else {
           alert('Ürün bulunamadı');
-          router.push('/admin');
+          router.push('/admin/products');
         }
       } catch (error) {
         console.error('Fetch error', error);
@@ -103,7 +103,7 @@ export default function EditProductPage() {
           finalDocType = getFileType(docFile.type);
           finalDocTitle = formData.documentTitle || docFile.name;
         } else {
-          alert('Döküman yüklenirken hata oluştu.');
+          alert('Belge yüklenirken hata oluştu.');
           setLoading(false);
           return;
         }
@@ -125,7 +125,7 @@ export default function EditProductPage() {
       });
 
       if (res.ok) {
-        router.push('/admin');
+        router.push('/admin/products');
         router.refresh();
       } else {
         alert('Ürün güncellenirken sunucu hatası oluştu.');
@@ -144,14 +144,14 @@ export default function EditProductPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
-        <Link href="/admin" className="text-sm font-semibold text-slate-500 hover:text-black transition-colors flex items-center gap-2">
+        <Link href="/admin/products" className="text-sm font-semibold text-slate-500 hover:text-black transition-colors flex items-center gap-2">
           ← Geri Dön
         </Link>
         <h1 className="text-2xl font-bold mt-4 text-slate-900">Ürünü Düzenle</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Basic Info */}
+        {/* Temel bilgiler */}
         <div className="bg-white p-6 border border-slate-200 rounded-xl shadow-sm space-y-5">
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">Ürün Adı</label>
@@ -194,17 +194,17 @@ export default function EditProductPage() {
           </div>
         </div>
 
-        {/* Document Upload */}
+        {/* Ürün belgesi */}
         <div className="bg-white p-6 border border-slate-200 rounded-xl shadow-sm space-y-4">
           <div>
             <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide">Ürün Belgesi</h3>
             <p className="text-xs text-slate-500 mt-1">PDF, Excel, Word veya PowerPoint belgesi ekleyebilirsiniz (opsiyonel).</p>
           </div>
 
-          {/* Current doc */}
+          {/* Mevcut belge */}
           {formData.documentUrl && !removeDoc && !docFile && (
             <div className="flex items-center gap-3 bg-zinc-50 border border-zinc-200 rounded-xl p-4">
-              <span className="text-2xl">{getDocIcon(formData.documentType)}</span>
+              <span className="rounded-lg bg-cyan-50 px-3 py-2 text-sm font-black text-cyan-800">{getDocIcon(formData.documentType)}</span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-slate-700 truncate">{formData.documentTitle || 'Mevcut belge'}</p>
                 <a href={formData.documentUrl} target="_blank" rel="noopener noreferrer"
@@ -223,10 +223,10 @@ export default function EditProductPage() {
             </div>
           )}
 
-          {/* New doc selected */}
+          {/* Yeni belge seçildi */}
           {docFile && (
             <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-4">
-              <span className="text-2xl">{getDocIcon(getFileType(docFile.type))}</span>
+              <span className="rounded-lg bg-cyan-50 px-3 py-2 text-sm font-black text-cyan-800">{getDocIcon(getFileType(docFile.type))}</span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-slate-700 truncate">{docFile.name}</p>
                 <p className="text-xs text-green-600">✓ Yeni dosya seçildi</p>
@@ -236,7 +236,7 @@ export default function EditProductPage() {
             </div>
           )}
 
-          {/* No doc / removed */}
+          {/* Belge yok veya kaldırıldı */}
           {!formData.documentUrl || removeDoc ? (
             !docFile && (
               <label className="block w-full border-2 border-dashed border-slate-300 hover:border-black rounded-xl p-6 text-center cursor-pointer transition-all">
@@ -254,11 +254,11 @@ export default function EditProductPage() {
             )
           ) : null}
 
-          {/* Document title */}
+          {/* Belge başlığı */}
           {hasDoc && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Belge Görünen Adı</label>
-              <input type="text" placeholder="Teknik Döküman, Ürün Kataloğu..."
+              <input type="text" placeholder="Teknik Belge, Ürün Kataloğu..."
                 className="w-full p-3 bg-white border border-slate-300 rounded-lg focus:border-black focus:ring-1 focus:ring-black outline-none transition-colors text-slate-900 text-sm"
                 value={formData.documentTitle} onChange={e => setFormData({ ...formData, documentTitle: e.target.value })} />
             </div>

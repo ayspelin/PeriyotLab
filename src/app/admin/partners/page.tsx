@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface Partner {
   id: string;
@@ -15,21 +14,22 @@ export default function PartnersAdminPage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  const fetchPartners = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/partners');
-      const data = await res.json();
-      setPartners(data);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchPartners();
+    let active = true;
+
+    fetch('/api/partners')
+      .then((res) => res.json())
+      .then((data) => {
+        if (active) setPartners(data);
+      })
+      .catch((e) => console.error(e))
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleDelete = async (id: string, name: string) => {
@@ -42,7 +42,7 @@ export default function PartnersAdminPage() {
       } else {
         alert('Silme işlemi başarısız oldu.');
       }
-    } catch (e) {
+    } catch {
       alert('Bir hata oluştu.');
     } finally {
       setDeleting(null);

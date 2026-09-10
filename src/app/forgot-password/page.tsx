@@ -30,8 +30,9 @@ export default function ForgotPasswordPage() {
 
       setMessage("Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.");
       setEmail("");
-    } catch (err: any) {
-      setError(err.message || "Bir hata oluştu.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Bir hata oluştu.";
+      setError(message);
     } finally {
       setLoading(false);
     }

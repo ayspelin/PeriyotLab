@@ -3,15 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Session } from "next-auth";
 
-export default function MobileMenu({ session }: { session: any }) {
+export default function MobileMenu({ session }: { session: Session | null }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-
-  // Close menu when route changes
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -40,7 +36,7 @@ export default function MobileMenu({ session }: { session: any }) {
       <button 
         onClick={toggleMenu}
         className="p-2 text-zinc-600 hover:text-black focus:outline-none"
-        aria-label="Toggle mobile menu"
+        aria-label="Mobil menüyü aç veya kapat"
       >
         <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {isOpen ? (
@@ -60,7 +56,7 @@ export default function MobileMenu({ session }: { session: any }) {
             <Link href="/" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/' ? 'text-black' : ''}`}>Ana Sayfa</Link>
             <Link href="/about" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/about' ? 'text-black' : ''}`}>Hakkımızda</Link>
             <Link href="/products" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/products' ? 'text-black' : ''}`}>Ürünler</Link>
-            <Link href="/documents" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/documents' ? 'text-black' : ''}`}>Dökümanlar</Link>
+            <Link href="/bakim-onarim" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/bakim-onarim' ? 'text-black' : ''}`}>Bakım Onarım</Link>
             <Link href="/contact" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/contact' ? 'text-black' : ''}`}>İletişim</Link>
             
             <div className="pt-8 border-t border-zinc-100 mt-auto pb-8">

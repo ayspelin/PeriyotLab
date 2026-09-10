@@ -16,7 +16,7 @@ export default function DeleteProductButton({ id }: { id: string }) {
   };
 
   return (
-    <button onClick={handleDelete} className="text-red-500 font-bold hover:underline uppercase text-xs tracking-wider">
+    <button onClick={handleDelete} className="inline-flex justify-center rounded-lg border border-red-200 bg-white px-5 py-3 text-base font-bold text-red-600 transition hover:bg-red-50">
       Sil
     </button>
   );

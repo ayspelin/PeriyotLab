@@ -41,7 +41,7 @@ export default function LoginPage() {
           </Link>
         </div>
         
-        <h1 className="text-xl font-extrabold text-black mb-8 text-center tracking-tight">PeriyotLab'a Hoşgeldiniz</h1>
+        <h1 className="text-xl font-extrabold text-black mb-8 text-center tracking-tight">PeriyotLab&apos;a Hoşgeldiniz</h1>
         
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 mb-6 text-sm text-center font-medium">
@@ -78,7 +78,7 @@ export default function LoginPage() {
           </button>
           
           <div className="mt-8 text-center text-sm text-zinc-500 pt-4">
-            Hesabınız yok mu? <Link href="/register" className="text-black font-bold hover:underline transition-all">Kayıt Olun</Link>
+            Yönetici hesabı, yetkili kurulum bilgileriyle oluşturulur.
           </div>
         </form>
       </div>

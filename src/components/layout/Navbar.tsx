@@ -28,11 +28,11 @@ export default async function Navbar() {
           <Link href="/" className="hover:text-black transition-colors">Ana Sayfa</Link>
           <Link href="/about" className="hover:text-black transition-colors">Hakkımızda</Link>
           <Link href="/products" className="hover:text-black transition-colors">Ürünler</Link>
-          <Link href="/documents" className="hover:text-black transition-colors">Dökümanlar</Link>
+          <Link href="/bakim-onarim" className="hover:text-black transition-colors">Bakım Onarım</Link>
           <Link href="/contact" className="hover:text-black transition-colors">İletişim</Link>
         </nav>
 
-        {/* Right: Login & Admin Conditional (Desktop) */}
+        {/* Right: Login & Management Conditional (Desktop) */}
         <div className="hidden md:flex items-center gap-4 text-[13px] font-bold uppercase tracking-wider">
           {!session ? (
             <Link href="/login" className="text-zinc-500 hover:text-black transition-colors px-6 py-2.5 rounded-full border border-zinc-200 hover:bg-zinc-50">

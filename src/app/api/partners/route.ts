@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from "@/lib/prisma";
+import { requireAdmin } from "@/lib/admin-auth";
 
 // GET: List all partners
 export async function GET() {
@@ -16,6 +17,9 @@ export async function GET() {
 
 // POST: Create a new partner
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     const body = await request.json();
     const { name, imageUrl, order } = body;

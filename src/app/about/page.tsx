@@ -3,18 +3,24 @@ import prisma from "@/lib/prisma";
 export const revalidate = 0; // Disable static caching so it updates immediately when changed in admin
 
 export default async function AboutPage() {
-  const settings = await prisma.siteSetting.findMany({
-    where: {
-      key: {
-        in: ['about_title', 'about_description', 'about_mission', 'about_vision', 'about_quality']
-      }
-    }
-  });
+  let settingsMap: Record<string, string> = {};
 
-  const settingsMap = settings.reduce((acc, setting) => {
-    acc[setting.key] = setting.value;
-    return acc;
-  }, {} as Record<string, string>);
+  try {
+    const settings = await prisma.siteSetting.findMany({
+      where: {
+        key: {
+          in: ['about_title', 'about_description', 'about_mission', 'about_vision', 'about_quality']
+        }
+      }
+    });
+
+    settingsMap = settings.reduce((acc, setting) => {
+      acc[setting.key] = setting.value;
+      return acc;
+    }, {} as Record<string, string>);
+  } catch {
+    settingsMap = {};
+  }
 
   const title = settingsMap.about_title || 'Hakkımızda';
   const description = settingsMap.about_description || 'PeriyotLab olarak, endüstrinin ihtiyaç duyduğu en yüksek kaliteli kimyasal bileşenleri sağlıyoruz. Güvenilirlik ve bilimsel mükemmeliyet temel vizyonumuzdur.';

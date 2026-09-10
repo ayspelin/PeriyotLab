@@ -25,6 +25,7 @@ export default async function Footer() {
         <div className="flex flex-wrap justify-center gap-6 text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-12">
           <Link href="/about" className="hover:text-white transition-colors">Hakkımızda</Link>
           <Link href="/products" className="hover:text-white transition-colors">Ürünler</Link>
+          <Link href="/bakim-onarim" className="hover:text-white transition-colors">Bakım Onarım</Link>
           <Link href="/contact" className="hover:text-white transition-colors">İletişim</Link>
         </div>
         

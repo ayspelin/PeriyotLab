@@ -30,7 +30,7 @@ export default function RegisterPage() {
       } else {
         setError(data.error || 'Kayıt sırasında bir hata oluştu');
       }
-    } catch (err) {
+    } catch {
       setError('Bağlantı hatası');
     } finally {
       setLoading(false);
@@ -41,8 +41,8 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-zinc-50">
       <div className="w-full max-w-md p-8 bg-white border border-zinc-200 shadow-sm rounded-xl">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Yönetici Kaydı</h1>
-          <p className="text-zinc-500 text-sm mt-2">PeriyotLab sistemine yeni yönetici ekleyin.</p>
+          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Yeni Yönetici Ekle</h1>
+          <p className="text-zinc-500 text-sm mt-2">Bu işlem için mevcut bir yönetici oturumu gerekir.</p>
         </div>
 
         {error && (
@@ -77,6 +77,7 @@ export default function RegisterPage() {
             <input
               type="password"
               required
+              minLength={8}
               className="w-full p-3 bg-zinc-50 border border-zinc-200 rounded focus:border-black focus:ring-1 focus:ring-black outline-none transition-colors text-black"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -88,13 +89,13 @@ export default function RegisterPage() {
             disabled={loading}
             className="w-full py-3 bg-black text-white font-bold tracking-wider uppercase text-sm rounded hover:bg-zinc-800 transition-colors mt-2"
           >
-            {loading ? 'Kaydediliyor...' : 'Kayıt Ol'}
+            {loading ? 'Kaydediliyor...' : 'Yöneticiyi Ekle'}
           </button>
         </form>
 
         <div className="mt-8 text-center text-sm">
-          <Link href="/login" className="text-zinc-500 hover:text-black transition-colors">
-            Zaten hesabınız var mı? Giriş Yapın
+          <Link href="/admin/settings" className="text-zinc-500 hover:text-black transition-colors">
+            Site ayarlarına dön
           </Link>
         </div>
       </div>

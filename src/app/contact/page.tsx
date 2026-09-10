@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 export const dynamic = 'force-dynamic';
 
 export default async function ContactPage() {
-  let settings: Record<string, string> = {};
+  const settings: Record<string, string> = {};
   try {
     const rows = await prisma.siteSetting.findMany({
       where: {
@@ -25,4 +25,3 @@ export default async function ContactPage() {
 
   return <ContactClient settings={settings} />;
 }
-

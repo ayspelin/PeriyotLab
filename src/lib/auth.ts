@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Admin Login",
+      name: "Yönetici Girişi",
       credentials: {
         email: { label: "E-Posta", type: "email", placeholder: "admin@periyotlab.com" },
         password: { label: "Şifre", type: "password" }
@@ -14,12 +14,12 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // .env yedeği (Super Admin)
+        // .env yedeği
         if (
           credentials.email === process.env.ADMIN_EMAIL &&
           credentials.password === process.env.ADMIN_PASSWORD
         ) {
-          return { id: "0", name: "Super Admin", email: credentials.email };
+          return { id: "0", name: "Ana Yönetici", email: credentials.email };
         }
 
         const user = await prisma.user.findUnique({
@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!isPasswordValid) return null;
 
-        return { id: user.id, name: user.name || "Admin", email: user.email };
+        return { id: user.id, name: user.name || "Yönetici", email: user.email };
       }
     })
   ],

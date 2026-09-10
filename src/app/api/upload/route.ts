@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { requireAdmin } from "@/lib/admin-auth";
 
 const ALLOWED_TYPES: Record<string, string> = {
   'image/jpeg': 'image',
@@ -19,21 +20,26 @@ const ALLOWED_TYPES: Record<string, string> = {
 };
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     const data = await request.formData();
     const file: File | null = data.get('file') as unknown as File;
 
     if (!file) {
-      return NextResponse.json({ success: false, error: 'No file found' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Dosya bulunamadı' }, { status: 400 });
     }
 
-    // Determine file category
     const fileCategory = ALLOWED_TYPES[file.type];
+    if (!fileCategory) {
+      return NextResponse.json({ success: false, error: 'Bu dosya türü desteklenmiyor' }, { status: 400 });
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const uniqueName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
 
-    // Check if S3 is configured
     if (
       process.env.AWS_REGION &&
       process.env.AWS_ACCESS_KEY_ID &&
@@ -61,7 +67,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, url, fileType: fileCategory || 'other' });
     }
 
-    // Fallback: local storage
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     try {
       await mkdir(uploadsDir, { recursive: true });
@@ -74,8 +79,7 @@ export async function POST(request: Request) {
       url: `/uploads/${uniqueName}`,
       fileType: fileCategory || 'other',
     });
-  } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json({ success: false, error: 'Upload failed' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ success: false, error: 'Dosya yüklenemedi' }, { status: 500 });
   }
 }

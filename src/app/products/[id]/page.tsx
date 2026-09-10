@@ -4,21 +4,28 @@ import prisma from "@/lib/prisma";
 import { notFound } from 'next/navigation';
 
 const FILE_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
-  pdf:   { label: 'PDF',   color: '#dc2626', bg: '#fef2f2', border: '#fecaca', icon: '📄' },
-  xlsx:  { label: 'Excel', color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0', icon: '📊' },
-  docx:  { label: 'Word',  color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', icon: '📝' },
-  pptx:  { label: 'PPT',   color: '#ea580c', bg: '#fff7ed', border: '#fed7aa', icon: '📋' },
-  other: { label: 'Dosya', color: '#71717a', bg: '#f4f4f5', border: '#d4d4d8', icon: '📎' },
+  pdf:   { label: 'PDF',   color: '#dc2626', bg: '#fef2f2', border: '#fecaca', icon: 'PDF' },
+  xlsx:  { label: 'Excel', color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0', icon: 'XLS' },
+  docx:  { label: 'Word',  color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', icon: 'DOC' },
+  pptx:  { label: 'PPT',   color: '#ea580c', bg: '#fff7ed', border: '#fed7aa', icon: 'PPT' },
+  other: { label: 'Dosya', color: '#71717a', bg: '#f4f4f5', border: '#d4d4d8', icon: 'DOSYA' },
 };
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
 }
 
+async function getProduct(id: string) {
+  try {
+    return await prisma.product.findUnique({ where: { id } });
+  } catch {
+    return null;
+  }
+}
+
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { id } = await params;
-
-  const product = await prisma.product.findUnique({ where: { id } });
+  const product = await getProduct(id);
 
   if (!product) notFound();
 
@@ -36,29 +43,24 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
       </Link>
 
       <div className="border border-gray-200 dark:border-gray-800 p-8 md:p-12 group">
-        {/* Category */}
         <div className="mb-6">
           <span className="text-sm font-bold uppercase tracking-widest text-gray-500">{product.category}</span>
         </div>
 
-        {/* Product Image */}
         {product.imageUrl && (
           <div className="mb-8 overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800">
             <img src={product.imageUrl} alt={product.name} className="w-full max-h-[400px] object-cover" />
           </div>
         )}
 
-        {/* Title */}
         <h1 className="text-4xl md:text-5xl font-bold mb-8">{product.name}</h1>
 
-        {/* Description */}
         <div className="mb-12">
           <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300">
             {product.description}
           </p>
         </div>
 
-        {/* Document Download */}
         {product.documentUrl && docConfig && (
           <div className="mb-10">
             <h3 className="text-sm font-bold uppercase tracking-widest mb-4">Ürün Belgesi</h3>
@@ -70,7 +72,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               style={{ borderColor: docConfig.border, background: docConfig.bg }}
             >
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-xs font-black flex-shrink-0"
                 style={{ background: '#fff', border: `1.5px solid ${docConfig.border}` }}
               >
                 {docConfig.icon}

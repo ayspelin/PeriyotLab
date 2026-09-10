@@ -2,8 +2,15 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
+interface HeroSlide {
+  id: string;
+  imageUrl: string;
+  title: string | null;
+  description: string | null;
+}
+
 export default function HeroSlidesAdmin() {
-  const [slides, setSlides] = useState<any[]>([]);
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Upload form state
@@ -20,7 +27,20 @@ export default function HeroSlidesAdmin() {
   };
 
   useEffect(() => {
-    fetchSlides();
+    let active = true;
+
+    fetch('/api/slides')
+      .then((res) => res.json())
+      .then((data) => {
+        if (active) setSlides(data);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleUpload = async (e: React.FormEvent) => {

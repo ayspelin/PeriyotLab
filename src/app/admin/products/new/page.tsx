@@ -14,11 +14,11 @@ function getFileType(mimeType: string): string {
 }
 
 function getDocIcon(type: string) {
-  if (type === 'pdf') return '📄';
-  if (type === 'xlsx') return '📊';
-  if (type === 'docx') return '📝';
-  if (type === 'pptx') return '📋';
-  return '📎';
+  if (type === 'pdf') return 'PDF';
+  if (type === 'xlsx') return 'XLS';
+  if (type === 'docx') return 'DOC';
+  if (type === 'pptx') return 'PPT';
+  return 'DOSYA';
 }
 
 export default function NewProductPage() {
@@ -39,7 +39,6 @@ export default function NewProductPage() {
     setLoading(true);
 
     try {
-      // Upload image
       let imageUrl = null;
       if (imageFile) {
         const uploadData = new FormData();
@@ -55,7 +54,6 @@ export default function NewProductPage() {
         }
       }
 
-      // Upload document
       let documentUrl = null;
       let documentType = null;
       if (docFile) {
@@ -67,7 +65,7 @@ export default function NewProductPage() {
           documentUrl = result.url;
           documentType = getFileType(docFile.type);
         } else {
-          alert('Döküman yüklenirken hata oluştu.');
+          alert('Belge yüklenirken hata oluştu.');
           setLoading(false);
           return;
         }
@@ -86,7 +84,7 @@ export default function NewProductPage() {
       });
 
       if (res.ok) {
-        router.push('/admin');
+        router.push('/admin/products');
         router.refresh();
       } else {
         alert('Ürün eklenirken sunucu hatası oluştu.');
@@ -101,14 +99,14 @@ export default function NewProductPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
-        <Link href="/admin" className="text-sm font-semibold text-slate-500 hover:text-black transition-colors flex items-center gap-2">
+        <Link href="/admin/products" className="text-sm font-semibold text-slate-500 hover:text-black transition-colors flex items-center gap-2">
           ← Geri Dön
         </Link>
         <h1 className="text-2xl font-bold mt-4 text-slate-900">Yeni Ürün Ekle</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Basic Info */}
+        {/* Temel bilgiler */}
         <div className="bg-white p-6 border border-slate-200 rounded-xl shadow-sm space-y-5">
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">Ürün Adı</label>
@@ -148,7 +146,7 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        {/* Document Upload */}
+        {/* Ürün belgesi */}
         <div className="bg-white p-6 border border-slate-200 rounded-xl shadow-sm space-y-4">
           <div>
             <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide">Ürün Belgesi</h3>
@@ -158,7 +156,7 @@ export default function NewProductPage() {
           <label className={`block w-full border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${docFile ? 'border-black bg-zinc-50' : 'border-slate-300 hover:border-black'}`}>
             {docFile ? (
               <div className="flex flex-col items-center gap-2">
-                <span className="text-3xl">{getDocIcon(getFileType(docFile.type))}</span>
+                <span className="rounded-lg bg-cyan-50 px-3 py-2 text-sm font-black text-cyan-800">{getDocIcon(getFileType(docFile.type))}</span>
                 <p className="font-semibold text-slate-900 text-sm">{docFile.name}</p>
                 <p className="text-xs text-slate-400">{(docFile.size / 1024 / 1024).toFixed(2)} MB</p>
                 <span className="text-xs text-green-600 font-medium">✓ Dosya seçildi</span>

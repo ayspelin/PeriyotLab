@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from "@/lib/prisma";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -13,6 +14,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 }
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const { id } = await params;
   try {
     const body = await request.json();
@@ -30,13 +34,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
     });
     return NextResponse.json(product);
-  } catch (error: any) {
+  } catch (error) {
+    const details = error instanceof Error ? error.message : "Unknown error";
     console.error("PUT Error:", error);
-    return NextResponse.json({ error: "Failed to update product", details: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update product", details }, { status: 500 });
   }
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const { id } = await params;
   try {
     await prisma.product.delete({

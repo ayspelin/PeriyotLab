@@ -3,10 +3,17 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 
+interface Partner {
+  id: string;
+  name: string;
+  imageUrl: string;
+  order: number;
+}
+
 export default function EditPartnerPage() {
   const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
+  const params = useParams<{ id: string }>();
+  const id = params.id;
 
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -19,8 +26,8 @@ export default function EditPartnerPage() {
     const fetchPartner = async () => {
       try {
         const res = await fetch('/api/partners');
-        const partners = await res.json();
-        const partner = partners.find((p: any) => p.id === id);
+        const partners: Partner[] = await res.json();
+        const partner = partners.find((p) => p.id === id);
         if (partner) {
           setFormData({ name: partner.name, order: String(partner.order) });
           setCurrentImageUrl(partner.imageUrl);
@@ -80,7 +87,7 @@ export default function EditPartnerPage() {
       } else {
         alert('Güncelleme sırasında bir sunucu hatası oluştu.');
       }
-    } catch (err) {
+    } catch {
       alert('Bir hata oluştu. Bağlantınızı kontrol edin.');
     } finally {
       setLoading(false);

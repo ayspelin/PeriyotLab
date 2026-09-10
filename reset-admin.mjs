@@ -11,9 +11,26 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function run() {
-  const hash = await bcrypt.hash('123456', 10);
-  await prisma.user.updateMany({ data: { password: hash } });
-  console.log('All users passwords updated to 123456');
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    throw new Error('ADMIN_EMAIL ve ADMIN_PASSWORD .env içinde tanımlı olmalıdır');
+  }
+
+  if (password.length < 8) {
+    throw new Error('ADMIN_PASSWORD en az 8 karakter olmalıdır');
+  }
+
+  const hash = await bcrypt.hash(password, 10);
+
+  await prisma.user.upsert({
+    where: { email },
+    update: { password: hash, name: 'PeriyotLab Yöneticisi' },
+    create: { email, password: hash, name: 'PeriyotLab Yöneticisi' },
+  });
+
+  console.log(`${email} için yönetici hesabı güncellendi`);
 }
 
 run()
