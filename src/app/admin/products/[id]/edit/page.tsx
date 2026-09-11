@@ -29,6 +29,7 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageInputKey, setImageInputKey] = useState(0);
   const [docFile, setDocFile] = useState<File | null>(null);
   const [removeDoc, setRemoveDoc] = useState(false);
   const [formData, setFormData] = useState({
@@ -130,11 +131,26 @@ export default function EditProductPage() {
       } else {
         alert('Ürün güncellenirken sunucu hatası oluştu.');
       }
-    } catch (error) {
+    } catch {
       alert('Bir hata oluştu.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageFile(e.target.files?.[0] ?? null);
+  };
+
+  const clearSelectedImage = () => {
+    setImageFile(null);
+    setImageInputKey((key) => key + 1);
+  };
+
+  const removeCurrentImage = () => {
+    if (!confirm('Bu ürün görselini kaldırmak istediğinize emin misiniz? Ürün kaydı silinmez.')) return;
+    setFormData({ ...formData, imageUrl: null });
+    clearSelectedImage();
   };
 
   if (fetching) return <div className="p-8 text-slate-500 text-sm">Yükleniyor...</div>;
@@ -171,11 +187,44 @@ export default function EditProductPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Görsel (değiştirmek için seçin)</label>
               {formData.imageUrl && !imageFile && (
-                <img src={formData.imageUrl} alt="Mevcut" className="h-10 w-10 object-cover rounded mb-1 border border-slate-200" />
+                <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <img src={formData.imageUrl} alt="Mevcut" className="h-12 w-12 rounded border border-slate-200 object-cover" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-slate-700">Mevcut görsel</p>
+                    <p className="text-xs text-slate-400">Yeni görsel seçmezseniz korunur.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeCurrentImage}
+                    className="shrink-0 rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-600 transition-colors hover:bg-red-50"
+                  >
+                    Görseli Sil
+                  </button>
+                </div>
               )}
-              <input type="file" accept="image/*"
+              {imageFile && (
+                <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-slate-700">{imageFile.name}</p>
+                    <p className="text-xs font-medium text-green-600">Yeni görsel seçildi.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={clearSelectedImage}
+                    className="shrink-0 rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-600 transition-colors hover:bg-red-50"
+                  >
+                    İptal
+                  </button>
+                </div>
+              )}
+              {!formData.imageUrl && !imageFile && (
+                <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3 text-sm font-semibold text-slate-400">
+                  Görsel yok
+                </div>
+              )}
+              <input key={imageInputKey} type="file" accept="image/*"
                 className="w-full p-2.5 bg-white border border-slate-300 rounded-lg focus:border-black outline-none text-slate-900 text-sm"
-                onChange={e => setImageFile(e.target.files ? e.target.files[0] : null)} />
+                onChange={handleImageChange} />
             </div>
           </div>
 

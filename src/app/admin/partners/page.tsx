@@ -13,6 +13,7 @@ export default function PartnersAdminPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [imageDeleting, setImageDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -46,6 +47,28 @@ export default function PartnersAdminPage() {
       alert('Bir hata oluştu.');
     } finally {
       setDeleting(null);
+    }
+  };
+
+  const handleDeleteImage = async (id: string, name: string) => {
+    if (!confirm(`"${name}" adlı çalışma ortağının görselini silmek istediğinizden emin misiniz? Ortak kaydı silinmez.`)) return;
+    setImageDeleting(id);
+    try {
+      const res = await fetch(`/api/partners/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: '' }),
+      });
+
+      if (res.ok) {
+        setPartners(prev => prev.map(p => p.id === id ? { ...p, imageUrl: '' } : p));
+      } else {
+        alert('Görsel silinemedi.');
+      }
+    } catch {
+      alert('Bir hata oluştu.');
+    } finally {
+      setImageDeleting(null);
     }
   };
 
@@ -98,11 +121,28 @@ export default function PartnersAdminPage() {
             >
               {/* Logo Preview */}
               <div className="relative h-36 bg-slate-50 flex items-center justify-center p-4">
-                <img
-                  src={partner.imageUrl}
-                  alt={partner.name}
-                  className="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
-                />
+                {partner.imageUrl ? (
+                  <>
+                    <img
+                      src={partner.imageUrl}
+                      alt={partner.name}
+                      className="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteImage(partner.id, partner.name)}
+                      disabled={imageDeleting === partner.id}
+                      className="absolute right-3 top-3 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-600 shadow-sm transition-colors hover:bg-red-50 disabled:opacity-50"
+                      title="Görseli Sil"
+                    >
+                      {imageDeleting === partner.id ? 'Siliniyor...' : 'Görseli Sil'}
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center rounded-lg border border-dashed border-slate-300 text-sm font-semibold text-slate-400">
+                    Görsel yok
+                  </div>
+                )}
               </div>
 
               {/* Info & Actions */}

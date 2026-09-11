@@ -19,6 +19,7 @@ export default function EditPartnerPage() {
   const [fetching, setFetching] = useState(true);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageInputKey, setImageInputKey] = useState(0);
   const [currentImageUrl, setCurrentImageUrl] = useState<string>('');
   const [formData, setFormData] = useState({ name: '', order: '0' });
 
@@ -42,7 +43,7 @@ export default function EditPartnerPage() {
       }
     };
     fetchPartner();
-  }, [id]);
+  }, [id, router]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -52,6 +53,18 @@ export default function EditPartnerPage() {
     } else {
       setImagePreview(null);
     }
+  };
+
+  const clearSelectedImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setImageInputKey((key) => key + 1);
+  };
+
+  const removeCurrentImage = () => {
+    if (!confirm('Bu ortak görselini kaldırmak istediğinize emin misiniz? Ortak kaydı silinmez.')) return;
+    setCurrentImageUrl('');
+    clearSelectedImage();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,14 +151,34 @@ export default function EditPartnerPage() {
               </div>
             )}
             <input
+              key={imageInputKey}
               type="file"
               accept="image/*"
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               onChange={handleImageChange}
             />
           </div>
-          {imagePreview && (
-            <p className="text-xs text-green-600 font-medium">✓ Yeni görsel seçildi. Kaydettiğinizde güncellenecek.</p>
+          {imagePreview ? (
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-medium text-green-600">✓ Yeni görsel seçildi. Kaydettiğinizde güncellenecek.</p>
+              <button
+                type="button"
+                onClick={clearSelectedImage}
+                className="text-xs font-bold text-red-500 transition-colors hover:text-red-700"
+              >
+                Seçimi İptal Et
+              </button>
+            </div>
+          ) : currentImageUrl ? (
+            <button
+              type="button"
+              onClick={removeCurrentImage}
+              className="rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-600 transition-colors hover:bg-red-50"
+            >
+              Görseli Sil
+            </button>
+          ) : (
+            <p className="text-xs font-medium text-slate-400">Görsel yok. Yeni görsel seçerseniz kaydettiğinizde eklenecek.</p>
           )}
         </div>
 

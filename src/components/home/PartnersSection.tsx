@@ -9,10 +9,12 @@ interface PartnersSectionProps {
 }
 
 export default function PartnersSection({ partners }: PartnersSectionProps) {
-  if (partners.length === 0) return null;
+  const visiblePartners = partners.filter((partner) => partner.imageUrl.trim().length > 0);
+
+  if (visiblePartners.length === 0) return null;
 
   // Triplicate for a very smooth infinite loop regardless of count
-  const items = [...partners, ...partners, ...partners];
+  const items = [...visiblePartners, ...visiblePartners, ...visiblePartners];
 
   return (
     <section className="partners-section">

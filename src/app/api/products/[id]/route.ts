@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
 
@@ -8,7 +9,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const product = await prisma.product.findUnique({ where: { id } });
     if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
     return NextResponse.json(product);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
   }
 }
@@ -20,18 +21,20 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   try {
     const body = await request.json();
+    const data: Prisma.ProductUpdateInput = {};
+
+    if (body.name !== undefined) data.name = body.name;
+    if (body.description !== undefined) data.description = body.description;
+    if (body.category !== undefined) data.category = body.category;
+    if (body.imageUrl !== undefined) data.imageUrl = body.imageUrl || null;
+    if (body.documentUrl !== undefined) data.documentUrl = body.documentUrl || null;
+    if (body.documentTitle !== undefined) data.documentTitle = body.documentTitle || null;
+    if (body.documentType !== undefined) data.documentType = body.documentType || null;
+    if (body.isFeatured !== undefined) data.isFeatured = body.isFeatured;
+
     const product = await prisma.product.update({
       where: { id },
-      data: {
-        name: body.name,
-        description: body.description,
-        category: body.category,
-        imageUrl: body.imageUrl !== undefined ? body.imageUrl : undefined,
-        documentUrl: body.documentUrl !== undefined ? body.documentUrl : undefined,
-        documentTitle: body.documentTitle !== undefined ? body.documentTitle : undefined,
-        documentType: body.documentType !== undefined ? body.documentType : undefined,
-        isFeatured: body.isFeatured !== undefined ? body.isFeatured : undefined,
-      }
+      data
     });
     return NextResponse.json(product);
   } catch (error) {
@@ -51,7 +54,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       where: { id }
     });
     return NextResponse.json({ message: "Product deleted" });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to delete product" }, { status: 500 });
   }
 }

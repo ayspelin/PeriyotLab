@@ -1,5 +1,24 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import prisma from "@/lib/prisma";
+
+async function getContactReceiverEmail() {
+  if (process.env.CONTACT_RECEIVER_EMAIL) {
+    return process.env.CONTACT_RECEIVER_EMAIL;
+  }
+
+  try {
+    const setting = await prisma.siteSetting.findUnique({
+      where: { key: 'contact_email' },
+    });
+
+    if (setting?.value) {
+      return setting.value;
+    }
+  } catch {}
+
+  return process.env.SMTP_USER;
+}
 
 export async function POST(request: Request) {
   try {
@@ -53,9 +72,11 @@ export async function POST(request: Request) {
       `
     };
 
+    const receiverEmail = await getContactReceiverEmail();
+
     const mailOptionsAdmin = {
       from: `"${name}" <${process.env.SMTP_USER}>`, 
-      to: 'pelingilik1@gmail.com', // Şimdilik test için sabitlendi. Sonra process.env.CONTACT_RECEIVER_EMAIL yapılacak.
+      to: receiverEmail,
       replyTo: email,
       subject: `Yeni Web Talebi: ${name}`,
       text: `Web sitenizden yeni bir form dolduruldu:\n\nGönderen: ${name}\nE-Posta: ${email}\nMesaj:\n${message}`,

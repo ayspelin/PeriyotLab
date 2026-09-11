@@ -2,6 +2,7 @@ import Link from 'next/link';
 import prisma from "@/lib/prisma";
 
 import DeleteProductButton from '@/components/admin/DeleteProductButton';
+import DeleteProductImageButton from '@/components/admin/DeleteProductImageButton';
 
 async function getProducts() {
   try {
@@ -63,6 +64,9 @@ export default async function AdminProductsPage() {
                 <Link href={`/admin/products/${product.id}/edit`} className="inline-flex justify-center rounded-lg bg-slate-950 px-5 py-3 text-base font-bold text-white transition hover:bg-cyan-700">
                   Düzenle
                 </Link>
+                {product.imageUrl && (
+                  <DeleteProductImageButton id={product.id} name={product.name} />
+                )}
                 <DeleteProductButton id={product.id} />
               </div>
             </div>
