@@ -12,9 +12,9 @@ export default async function Navbar() {
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         {/* Left: Logo */}
         <Link href="/" className="flex items-center group">
-          <div className="relative w-40 h-12">
+          <div className="relative w-48 h-16">
             <Image 
-              src="/logo.png" 
+              src="/logo.svg" 
               alt="PeriyotLab Logo" 
               fill 
               className="object-contain group-hover:opacity-80 transition-opacity" 

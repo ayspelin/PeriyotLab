@@ -35,8 +35,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white border border-zinc-200 rounded-[2rem] p-8 sm:p-12 shadow-xl">
         <div className="flex justify-center mb-8">
           <Link href="/">
-            <div className="relative w-48 h-16">
-              <Image src="/logo.png" alt="Logo" fill className="object-contain" unoptimized quality={100} />
+            <div className="relative w-56 h-20">
+              <Image src="/logo.svg" alt="Logo" fill className="object-contain" unoptimized quality={100} />
             </div>
           </Link>
         </div>
