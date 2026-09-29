@@ -68,3 +68,76 @@ model Document {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
+model CustomManufacturingItem {
+  id                      String   @id @default(uuid())
+  title                   String
+  slug                    String   @unique
+  shortDescription        String
+  description             String
+  usageArea               String?
+  applicationArea         String?
+  technicalSpecifications Json     @default("[]")
+  projectNotes            String?
+  coverImage              String?
+  galleryImages           Json     @default("[]")
+  videoUrl                String?
+  featured                Boolean  @default(false)
+  published               Boolean  @default(false)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([published])
+  @@index([featured])
+  @@index([createdAt])
+}
+
+model ServiceRequest {
+  id                 String         @id @default(uuid())
+  customerName       String
+  companyName        String
+  phone              String
+  email              String
+  deviceType         String
+  brand              String
+  model              String
+  serialNumber       String?
+  problemDescription String
+  note               String?
+  images             Json           @default("[]")
+  status             String         @default("NEW")
+  serviceRecord      ServiceRecord? @relation("RequestToRecord")
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+model ServiceRecord {
+  id                      String          @id @default(uuid())
+  trackingCode            String          @unique
+  customerName            String
+  companyName             String
+  phone                   String
+  email                   String
+  deviceType              String
+  brand                   String
+  model                   String
+  serialNumber            String?
+  problemDescription      String
+  receivedDate            DateTime
+  estimatedCompletionDate DateTime?
+  status                  String
+  technicianNote          String?
+  customerNote            String?
+  images                  Json            @default("[]")
+  serviceHistory          Json            @default("[]")
+  sourceRequestId         String?         @unique
+  sourceRequest           ServiceRequest? @relation("RequestToRecord", fields: [sourceRequestId], references: [id])
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+
+  @@index([receivedDate])
+  @@index([status])
+}

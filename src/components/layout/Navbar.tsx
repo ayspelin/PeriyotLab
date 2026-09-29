@@ -24,11 +24,13 @@ export default async function Navbar() {
         </Link>
 
         {/* Center: Navigation (Desktop) */}
-        <nav className="hidden md:flex items-center gap-8 text-[13px] font-bold uppercase tracking-widest text-zinc-500">
+        <nav className="hidden md:flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-zinc-500 lg:gap-6 xl:gap-8 xl:text-[13px]">
           <Link href="/" className="hover:text-black transition-colors">Ana Sayfa</Link>
           <Link href="/about" className="hover:text-black transition-colors">Hakkımızda</Link>
           <Link href="/products" className="hover:text-black transition-colors">Ürünler</Link>
+          <Link href="/ozel-imalat" className="hover:text-black transition-colors">Özel İmalat</Link>
           <Link href="/bakim-onarim" className="hover:text-black transition-colors">Bakım Onarım</Link>
+          <Link href="/servis-takip" className="hover:text-black transition-colors">Servis Takip</Link>
           <Link href="/contact" className="hover:text-black transition-colors">İletişim</Link>
         </nav>
 

@@ -140,6 +140,9 @@ export default async function MaintenancePage() {
               <a href="#servis-talep-formu" className="inline-flex justify-center rounded-full bg-cyan-300 px-7 py-4 text-base font-black text-zinc-950 transition hover:bg-white">
                 Servis Talebi Oluştur
               </a>
+              <Link href="/servis-takip" className="inline-flex justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-base font-bold text-white transition hover:bg-white/20">
+                Servis Takip
+              </Link>
               <a href={whatsappHref} {...whatsappProps} className="inline-flex justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-base font-bold text-white transition hover:bg-white/20">
                 WhatsApp ile İletişime Geç
               </a>
@@ -403,6 +406,9 @@ export default async function MaintenancePage() {
                 <a href="#servis-talep-formu" className="inline-flex justify-center rounded-full bg-cyan-300 px-7 py-4 text-base font-black text-zinc-950 transition hover:bg-white">
                   Servis Talebi Oluştur
                 </a>
+                <Link href="/servis-takip" className="inline-flex justify-center rounded-full border border-white/20 bg-white/10 px-7 py-4 text-base font-bold text-white transition hover:bg-white/20">
+                  Servis Takip
+                </Link>
                 <a href={whatsappHref} {...whatsappProps} className="inline-flex justify-center rounded-full border border-white/20 bg-white/10 px-7 py-4 text-base font-bold text-white transition hover:bg-white/20">
                   WhatsApp
                 </a>

@@ -6,9 +6,20 @@ import {
   PHONE_VALIDATION_MESSAGE,
   normalizeTrMobilePhone,
 } from "@/lib/contactInfo";
+import { getRequestImagesFromFiles } from "@/lib/serviceTracking";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+const allowedCustomAttachmentTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+]);
 const maxImageCount = 5;
 const maxImageSize = 5 * 1024 * 1024;
 const maxTotalImageSize = 15 * 1024 * 1024;
@@ -36,7 +47,20 @@ type ServiceSubmission = {
   files: File[];
 };
 
-type Submission = ContactSubmission | ServiceSubmission;
+type CustomManufacturingSubmission = {
+  type: "custom-manufacturing";
+  name: string;
+  company: string;
+  phone: string;
+  email: string;
+  projectTitle: string;
+  systemDescription: string;
+  technicalRequirements: string;
+  notes: string;
+  files: File[];
+};
+
+type Submission = ContactSubmission | ServiceSubmission | CustomManufacturingSubmission;
 
 function validationError(error: string, fieldErrors?: Record<string, string>) {
   return NextResponse.json({ success: false, error, fieldErrors }, { status: 400 });
@@ -157,6 +181,7 @@ async function parseMultipartSubmission(request: Request) {
     return validationError("Form verisi okunamadı. Fotoğraf boyutlarını kontrol edip tekrar deneyin.");
   }
 
+  const submissionType = getFormString(formData, "type");
   const name = getFormString(formData, "name");
   const company = getFormString(formData, "company");
   const phone = getFormString(formData, "phone");
@@ -174,6 +199,65 @@ async function parseMultipartSubmission(request: Request) {
   const baseError = validateBaseFields(name, email, phone);
   if (baseError) {
     return validationError(baseError.message, { [baseError.field]: baseError.message });
+  }
+
+  if (submissionType === "custom-manufacturing") {
+    const projectTitle = getFormString(formData, "projectTitle");
+    const systemDescription = getFormString(formData, "systemDescription");
+    const technicalRequirements = getFormString(formData, "technicalRequirements");
+
+    const requiredErrors = [
+      assertRequired(company, "company", "Firma alanı zorunludur."),
+      assertRequired(projectTitle, "projectTitle", "İhtiyaç / Proje Başlığı alanı zorunludur."),
+      assertRequired(systemDescription, "systemDescription", "İstenen cihaz veya sistem açıklaması zorunludur."),
+      assertRequired(technicalRequirements, "technicalRequirements", "Teknik gereksinimler alanı zorunludur."),
+    ].filter(Boolean) as Array<{ field: string; message: string }>;
+
+    if (requiredErrors[0]) {
+      return validationError(requiredErrors[0].message, { [requiredErrors[0].field]: requiredErrors[0].message });
+    }
+
+    if (files.length > maxImageCount) {
+      return validationError(`En fazla ${maxImageCount} dosya yükleyebilirsiniz.`, {
+        images: `En fazla ${maxImageCount} dosya yükleyebilirsiniz.`,
+      });
+    }
+
+    const totalSize = files.reduce((total, file) => total + file.size, 0);
+    if (totalSize > maxTotalImageSize) {
+      return validationError("Dosyaların toplam boyutu 15 MB'ı geçmemelidir.", {
+        images: "Dosyaların toplam boyutu 15 MB'ı geçmemelidir.",
+      });
+    }
+
+    for (const file of files) {
+      if (!allowedCustomAttachmentTypes.has(file.type)) {
+        return validationError("Yalnızca görsel, PDF, Word veya Excel dosyası yükleyebilirsiniz.", {
+          images: "Yalnızca görsel, PDF, Word veya Excel dosyası yükleyebilirsiniz.",
+        });
+      }
+
+      if (file.size > maxImageSize) {
+        return validationError("Her dosya en fazla 5 MB olabilir.", {
+          images: "Her dosya en fazla 5 MB olabilir.",
+        });
+      }
+    }
+
+    const submission: CustomManufacturingSubmission = {
+      type: "custom-manufacturing",
+      name,
+      company,
+      phone: normalizePhoneOrThrow(phone),
+      email,
+      projectTitle,
+      systemDescription,
+      technicalRequirements,
+      notes,
+      files,
+    };
+
+    return submission;
   }
 
   const requiredErrors = [
@@ -286,7 +370,15 @@ function getTransporter() {
 }
 
 function getSubmissionTitle(submission: Submission) {
-  return submission.type === "service" ? "Yeni Servis Talebi" : "Yeni İletişim Talebi";
+  if (submission.type === "service") {
+    return "Yeni Servis Talebi";
+  }
+
+  if (submission.type === "custom-manufacturing") {
+    return "Yeni Özel İmalat Talebi";
+  }
+
+  return "Yeni İletişim Talebi";
 }
 
 function buildPlainText(submission: Submission) {
@@ -310,6 +402,29 @@ function buildPlainText(submission: Submission) {
       submission.notes || "-",
       "",
       `Fotoğraf Sayısı: ${submission.files.length}`,
+    ].join("\n");
+  }
+
+  if (submission.type === "custom-manufacturing") {
+    return [
+      "Yeni özel imalat talebi:",
+      "",
+      `Ad Soyad: ${submission.name}`,
+      `Firma: ${submission.company}`,
+      `Telefon: +90${submission.phone}`,
+      `E-posta: ${submission.email}`,
+      `İhtiyaç / Proje Başlığı: ${submission.projectTitle}`,
+      "",
+      "İstenen cihaz veya sistem açıklaması:",
+      submission.systemDescription,
+      "",
+      "Teknik gereksinimler:",
+      submission.technicalRequirements,
+      "",
+      "Ek Not:",
+      submission.notes || "-",
+      "",
+      `Dosya Sayısı: ${submission.files.length}`,
     ].join("\n");
   }
 
@@ -337,18 +452,41 @@ function buildAdminHtml(submission: Submission) {
           ["Marka", submission.brand],
           ["Model", submission.model],
           ["Seri Numarası", submission.serialNumber || "-"],
-          ["Fotoğraf Sayısı", String(submission.files.length)],
+            ["Fotoğraf Sayısı", String(submission.files.length)],
         ]
+      : submission.type === "custom-manufacturing"
+        ? [
+            ["Ad Soyad", submission.name],
+            ["Firma", submission.company],
+            ["Telefon", `+90${submission.phone}`],
+            ["E-posta", submission.email],
+            ["İhtiyaç / Proje Başlığı", submission.projectTitle],
+            ["Dosya Sayısı", String(submission.files.length)],
+          ]
       : [
           ["Ad Soyad", submission.name],
           ["Telefon", `+90${submission.phone}`],
           ["E-posta", submission.email],
         ];
 
-  const detailTitle = submission.type === "service" ? "Arıza / Problem Açıklaması" : "Mesaj";
-  const detailText = submission.type === "service" ? submission.fault : submission.message;
-  const notesHtml =
+  const detailTitle =
     submission.type === "service"
+      ? "Arıza / Problem Açıklaması"
+      : submission.type === "custom-manufacturing"
+        ? "İstenen Cihaz veya Sistem Açıklaması"
+        : "Mesaj";
+  const detailText =
+    submission.type === "service"
+      ? submission.fault
+      : submission.type === "custom-manufacturing"
+        ? submission.systemDescription
+        : submission.message;
+  const requirementsHtml =
+    submission.type === "custom-manufacturing"
+      ? `<h3 style="margin-top:24px">Teknik Gereksinimler</h3><p style="line-height:1.6">${textToHtml(submission.technicalRequirements)}</p>`
+      : "";
+  const notesHtml =
+    submission.type === "service" || submission.type === "custom-manufacturing"
       ? `<h3 style="margin-top:24px">Ek Not</h3><p style="line-height:1.6">${textToHtml(submission.notes || "-")}</p>`
       : "";
 
@@ -371,13 +509,19 @@ function buildAdminHtml(submission: Submission) {
       </table>
       <h3 style="margin-top:24px">${detailTitle}</h3>
       <p style="line-height:1.6;white-space:normal">${textToHtml(detailText)}</p>
+      ${requirementsHtml}
       ${notesHtml}
     </div>
   `;
 }
 
 function buildCustomerText(submission: Submission) {
-  const requestName = submission.type === "service" ? "servis talebiniz" : "iletişim talebiniz";
+  const requestName =
+    submission.type === "service"
+      ? "servis talebiniz"
+      : submission.type === "custom-manufacturing"
+        ? "özel imalat talebiniz"
+        : "iletişim talebiniz";
 
   return [
     `Sayın ${submission.name},`,
@@ -391,7 +535,12 @@ function buildCustomerText(submission: Submission) {
 }
 
 function buildCustomerHtml(submission: Submission) {
-  const requestName = submission.type === "service" ? "servis talebiniz" : "iletişim talebiniz";
+  const requestName =
+    submission.type === "service"
+      ? "servis talebiniz"
+      : submission.type === "custom-manufacturing"
+        ? "özel imalat talebiniz"
+        : "iletişim talebiniz";
 
   return `
     <div style="font-family:Arial,sans-serif;color:#222;line-height:1.6">
@@ -404,7 +553,7 @@ function buildCustomerHtml(submission: Submission) {
 }
 
 async function buildAttachments(submission: Submission) {
-  if (submission.type !== "service" || submission.files.length === 0) {
+  if (!("files" in submission) || submission.files.length === 0) {
     return [];
   }
 
@@ -479,7 +628,29 @@ export async function POST(request: Request) {
       attachments,
     });
 
-    return NextResponse.json({ success: true, message: CONTACT_SUCCESS_MESSAGE });
+    let serviceRequestId: string | undefined;
+    if (parsed.type === "service") {
+      const serviceRequest = await prisma.serviceRequest.create({
+        data: {
+          customerName: parsed.name,
+          companyName: parsed.company,
+          phone: `+90${parsed.phone}`,
+          email: parsed.email,
+          deviceType: parsed.deviceType,
+          brand: parsed.brand,
+          model: parsed.model,
+          serialNumber: parsed.serialNumber || null,
+          problemDescription: parsed.fault,
+          note: parsed.notes || null,
+          images: getRequestImagesFromFiles(parsed.files),
+        },
+        select: { id: true },
+      });
+
+      serviceRequestId = serviceRequest.id;
+    }
+
+    return NextResponse.json({ success: true, message: CONTACT_SUCCESS_MESSAGE, serviceRequestId });
   } catch (error) {
     console.error("[Contact API] Mail send failed:", getErrorDetails(error));
     return NextResponse.json(

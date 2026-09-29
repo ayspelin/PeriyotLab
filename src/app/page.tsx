@@ -1,7 +1,6 @@
 import HeroSlider from "@/components/home/HeroSlider";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import ProductCard from "@/components/products/ProductCard";
 import PartnersSection from "@/components/home/PartnersSection";
 
 type HomeProduct = {
@@ -23,6 +22,25 @@ type HomePartner = {
   id: string;
   name: string;
   imageUrl: string;
+};
+
+type HomeCustomManufacturingItem = {
+  id: string;
+  title: string;
+  slug: string;
+  shortDescription: string;
+  coverImage: string | null;
+  createdAt: Date;
+};
+
+type FeaturedContent = {
+  type: "CUSTOM_MANUFACTURING" | "PRODUCT";
+  title: string;
+  image: string | null;
+  description: string;
+  badge: string;
+  href: string;
+  createdAt: Date;
 };
 
 const settingKeys = [
@@ -82,39 +100,9 @@ const solutionCards = [
   },
 ];
 
-const fallbackFeaturedProducts: HomeProduct[] = [
-  {
-    id: "fallback-hplc-methanol",
-    name: "HPLC Grade Metanol",
-    description: "Kromatografi ve hassas analiz süreçleri için yüksek saflıkta çözücü.",
-    category: "Solventler",
-    imageUrl: "/mock/prod1.png",
-  },
-  {
-    id: "fallback-sodium-hydroxide",
-    name: "Sodyum Hidroksit Peletleri",
-    description: "Titrasyon, nötralizasyon ve genel laboratuvar işlemleri için analitik kalite.",
-    category: "İnorganik Kimyasallar",
-    imageUrl: "/mock/prod2.png",
-  },
-  {
-    id: "fallback-organic-synthesis",
-    name: "Organik Sentez Ara Ürünleri",
-    description: "Araştırma ve üretim laboratuvarları için seçilmiş reaktif ve ara ürünler.",
-    category: "Organik Kimyasallar",
-    imageUrl: "/mock/prod3.png",
-  },
-  {
-    id: "fallback-buffer-set",
-    name: "Tampon Çözelti Seti",
-    description: "pH metre kalibrasyonu ve kalite kontrol süreçleri için standart çözeltiler.",
-    category: "Analitik Çözeltiler",
-    imageUrl: "/mock/prod4.png",
-  },
-];
-
 export default async function Home() {
-  let featuredProducts: HomeProduct[] = fallbackFeaturedProducts;
+  let featuredProducts: HomeProduct[] = [];
+  let featuredCustomItems: HomeCustomManufacturingItem[] = [];
   let heroSlides: HomeHeroSlide[] = [];
   let partners: HomePartner[] = [];
   const settings: Record<string, string> = {};
@@ -123,7 +111,22 @@ export default async function Home() {
       where: { isFeatured: true },
       orderBy: { createdAt: 'desc' }
     });
-    featuredProducts = dbFeaturedProducts.length > 0 ? dbFeaturedProducts : fallbackFeaturedProducts;
+    featuredProducts = dbFeaturedProducts;
+    featuredCustomItems = await prisma.customManufacturingItem.findMany({
+      where: {
+        featured: true,
+        published: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        shortDescription: true,
+        coverImage: true,
+        createdAt: true,
+      },
+    });
     heroSlides = await prisma.heroSlide.findMany({
       orderBy: { order: 'asc' }
     });
@@ -140,9 +143,28 @@ export default async function Home() {
     siteSettings.forEach(s => {
       settings[s.key] = s.value;
     });
-  } catch {
-    featuredProducts = fallbackFeaturedProducts;
-  }
+  } catch {}
+
+  const featuredContent: FeaturedContent[] = [
+    ...featuredCustomItems.map((item) => ({
+      type: "CUSTOM_MANUFACTURING" as const,
+      title: item.title,
+      image: item.coverImage,
+      description: item.shortDescription,
+      badge: "Özel İmalat",
+      href: `/ozel-imalat/${item.slug}`,
+      createdAt: item.createdAt,
+    })),
+    ...featuredProducts.map((product) => ({
+      type: "PRODUCT" as const,
+      title: product.name,
+      image: product.imageUrl,
+      description: product.description,
+      badge: "Ürün",
+      href: `/products/${product.id}`,
+      createdAt: new Date(),
+    })),
+  ].slice(0, 6);
 
   const stats = [
     {
@@ -256,36 +278,58 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="py-24 bg-[#f5f7f8] relative border-t border-zinc-200/60">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div className="max-w-2xl">
+      {featuredContent.length > 0 && (
+        <section className="py-24 bg-[#f5f7f8] relative border-t border-zinc-200/60">
+          <div className="container mx-auto px-4">
+            <div className="mb-16 max-w-3xl">
               <span className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-700">Öne Çıkanlar</span>
-              <h2 className="mt-3 text-3xl md:text-5xl font-black text-zinc-950 mb-4 tracking-tight">Laboratuvarınız için seçilmiş ürünler</h2>
+              <h2 className="mt-3 text-3xl md:text-5xl font-black text-zinc-950 mb-4 tracking-tight">PeriyotLab’dan Öne Çıkanlar</h2>
               <p className="text-zinc-600 text-lg leading-relaxed">
-                En çok görünür olmasını istediğiniz ürünleri admin panelinden öne çıkarabilir, ana sayfada bu alanda sergileyebilirsiniz.
+                Özel imalat çalışmalarımızı, laboratuvar çözümlerimizi ve seçili ürünleri keşfedin.
               </p>
             </div>
-            <Link href="/products" className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-950 hover:text-cyan-700 transition-colors">
-              Tümünü Gör <span className="text-lg">→</span>
-            </Link>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-            {featuredProducts.length === 0 && (
-              <div className="col-span-full py-24 text-center bg-white rounded-2xl border border-dashed border-zinc-300 text-zinc-500 flex flex-col items-center shadow-sm">
-                <span className="text-4xl mb-4 text-zinc-300">
-                  <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M10 2v7.31M14 2v7.31M8.5 2h7M7 21h10a2 2 0 0 0 2-2v-1.72a2 2 0 0 0-.59-1.41l-4.83-4.83a2 2 0 0 1-.58-1.41V2a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v7.63a2 2 0 0 1-.58 1.41l-4.83 4.83A2 2 0 0 0 1 17.28V19a2 2 0 0 0 2 2z"/>
-                  </svg>
-                </span>
-                <p className="font-medium text-lg text-black">Henüz sistemde ürün bulunmuyor.</p>
-                <p className="text-sm mt-2">Yönetici panelinden yeni ürünler ekleyebilirsiniz.</p>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {featuredContent.map((item) => (
+                <Link key={`${item.type}-${item.href}`} href={item.href} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-950/10">
+                  <div className="h-64 overflow-hidden bg-zinc-950">
+                    {item.image ? (
+                      <img src={item.image} alt={item.title} className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center p-8 text-center text-sm font-bold text-zinc-400">Görsel eklenmedi</div>
+                    )}
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
+                    <span className="mb-5 inline-flex w-fit rounded-full border border-cyan-100 bg-cyan-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-800">
+                      {item.badge}
+                    </span>
+                    <h3 className="text-2xl font-black tracking-tight text-zinc-950 transition-colors group-hover:text-cyan-800">{item.title}</h3>
+                    <p className="mt-4 line-clamp-3 flex-1 text-sm leading-6 text-zinc-600">{item.description}</p>
+                    <div className="mt-8 border-t border-zinc-100 pt-4 text-xs font-bold uppercase tracking-widest text-zinc-950">
+                      İncele <span className="ml-2 transition-transform group-hover:translate-x-2" aria-hidden="true">→</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="bg-white py-20 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="overflow-hidden rounded-2xl bg-zinc-950 p-8 text-white shadow-2xl shadow-cyan-950/10 md:p-12">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <h2 className="text-3xl font-black tracking-tight md:text-5xl">Standart Ürünler İhtiyacınızı Karşılamıyor mu?</h2>
+                <p className="mt-5 max-w-3xl text-lg leading-8 text-zinc-300">
+                  Uygulamanıza özel cihaz ve sistem ihtiyaçlarınız için PeriyotLab özel imalat çözümlerini inceleyin.
+                </p>
               </div>
-            )}
+              <Link href="/ozel-imalat" className="inline-flex justify-center rounded-full bg-cyan-300 px-7 py-4 text-base font-black text-zinc-950 transition hover:bg-white">
+                Özel İmalatı İncele
+              </Link>
+            </div>
           </div>
         </div>
       </section>
