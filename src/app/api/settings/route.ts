@@ -6,6 +6,7 @@ const ALLOWED_SETTING_KEYS = [
   'footer_text',
   'contact_email',
   'contact_phone',
+  'contact_whatsapp',
   'contact_address',
   'contact_office_name',
   'contact_working_hours',

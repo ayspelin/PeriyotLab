@@ -1,35 +1,51 @@
 'use client';
 import { useState } from 'react';
+import {
+  CONTACT_SUCCESS_MESSAGE,
+  PHONE_VALIDATION_MESSAGE,
+  getGoogleMapsEmbedHref,
+  getGoogleMapsHref,
+  normalizeTrMobilePhone,
+  resolveContactInfo,
+  type ContactSettings,
+} from '@/lib/contactInfo';
 
 interface Props {
-  settings: Record<string, string>;
+  settings: ContactSettings;
 }
 
 export default function ContactClient({ settings }: Props) {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-
-  const email = settings['contact_email'] || 'info@periyotlab.com';
-  const phone = settings['contact_phone'] || '+90 (212) 555 0123';
-  const address = settings['contact_address'] || 'Ankara, Türkiye';
-  const officeName = settings['contact_office_name'] || 'PeriyotLab';
-  const workingHours = settings['contact_working_hours'] || 'Pazartesi - Cuma, 09:00 - 18:00';
+  const contactInfo = resolveContactInfo(settings);
+  const mapsHref = getGoogleMapsHref(contactInfo.mapsQuery);
+  const mapsEmbedHref = getGoogleMapsEmbedHref(contactInfo.mapsQuery);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (status === 'loading') return;
+
+    const normalizedPhone = normalizeTrMobilePhone(formData.phone);
+    if (!normalizedPhone) {
+      setStatus('error');
+      setErrorMessage(PHONE_VALIDATION_MESSAGE);
+      return;
+    }
+
     setStatus('loading');
     setErrorMessage('');
+
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, phone: normalizedPhone }),
       });
       const data = await res.json();
       if (data.success) {
         setStatus('success');
-        setFormData({ name: '', email: '', message: '' });
+        setFormData({ name: '', email: '', phone: '', message: '' });
       } else {
         setStatus('error');
         setErrorMessage(data.error || 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
@@ -55,7 +71,7 @@ export default function ContactClient({ settings }: Props) {
           {status === 'success' ? (
             <div className="p-8 bg-green-50 text-green-800 border border-green-200">
               <h3 className="text-xl font-bold mb-2">Mesajınız Gönderildi!</h3>
-              <p>Size en kısa sürede dönüş yapacağız. Teşekkür ederiz.</p>
+              <p>{CONTACT_SUCCESS_MESSAGE}</p>
               <button onClick={() => setStatus('idle')} className="mt-4 underline text-sm font-bold">Yeni mesaj gönder</button>
             </div>
           ) : (
@@ -78,6 +94,12 @@ export default function ContactClient({ settings }: Props) {
                 </div>
               </div>
               <div className="space-y-3">
+                <label htmlFor="phone" className="text-xs font-bold uppercase tracking-widest text-gray-500">Telefon</label>
+                <input required type="tel" id="phone" inputMode="tel" autoComplete="tel" placeholder="5321234567"
+                  className="w-full p-4 bg-gray-50 dark:bg-zinc-900 border border-transparent hover:border-gray-300 dark:hover:border-gray-700 focus:outline-none focus:border-foreground dark:focus:border-foreground transition-colors"
+                  value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+              </div>
+              <div className="space-y-3">
                 <label htmlFor="message" className="text-xs font-bold uppercase tracking-widest text-gray-500">Mesajınız</label>
                 <textarea required id="message" rows={6}
                   className="w-full p-4 bg-gray-50 dark:bg-zinc-900 border border-transparent hover:border-gray-300 dark:hover:border-gray-700 focus:outline-none focus:border-foreground dark:focus:border-foreground transition-colors"
@@ -95,28 +117,28 @@ export default function ContactClient({ settings }: Props) {
         <div className="w-full lg:w-1/3 space-y-10">
           <div className="border-l-2 border-foreground pl-6">
             <h3 className="text-xs font-bold uppercase tracking-widest mb-3 text-gray-500">Ofis</h3>
-            <p className="font-medium text-lg leading-relaxed whitespace-pre-line">{officeName}</p>
+            <p className="font-medium text-lg leading-relaxed whitespace-pre-line">{contactInfo.officeName}</p>
           </div>
           <div className="border-l-2 border-foreground pl-6">
             <h3 className="text-xs font-bold uppercase tracking-widest mb-3 text-gray-500">Adres</h3>
-            <p className="font-medium text-lg leading-relaxed whitespace-pre-line">{address}</p>
+            <p className="font-medium text-lg leading-relaxed whitespace-pre-line">{contactInfo.address}</p>
           </div>
           <div className="border-l-2 border-foreground pl-6">
             <h3 className="text-xs font-bold uppercase tracking-widest mb-3 text-gray-500">İletişim Bilgileri</h3>
             <p className="font-medium text-lg leading-relaxed">
-              {email}<br />{phone}
+              {contactInfo.email}{contactInfo.phone ? <><br />{contactInfo.phone}</> : null}
             </p>
           </div>
           <div className="border-l-2 border-foreground pl-6">
             <h3 className="text-xs font-bold uppercase tracking-widest mb-3 text-gray-500">Çalışma Saatleri</h3>
-            <p className="font-medium text-lg leading-relaxed whitespace-pre-line">{workingHours}</p>
+            <p className="font-medium text-lg leading-relaxed whitespace-pre-line">{contactInfo.workingHours}</p>
           </div>
           
           <div className="pt-6 border-t border-gray-200 dark:border-gray-800">
             <h3 className="text-xs font-bold uppercase tracking-widest mb-4 text-gray-500">Konum</h3>
-            <div className="w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
+            <div className="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3008.2046808796845!2d28.986861515415714!3d41.06456097929424!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab6f30a905ccb%3A0xc68297753c1afefc!2sLevent%2C%20Be%C5%9Fikta%C5%9F%2F%C4%B0stanbul!5e0!3m2!1str!2str!4v1682855554444!5m2!1str!2str" 
+                src={mapsEmbedHref}
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 
@@ -124,7 +146,15 @@ export default function ContactClient({ settings }: Props) {
                 loading="lazy" 
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Google Maps"
+                className="pointer-events-none"
               ></iframe>
+              <a
+                href={mapsHref}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Google Maps'te aç"
+                className="absolute inset-0"
+              />
             </div>
           </div>
         </div>

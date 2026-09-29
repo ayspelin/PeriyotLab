@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
+import { CONTACT_SETTING_KEYS, getWhatsappHref, resolveContactInfo } from "@/lib/contactInfo";
 import ServiceRequestForm from "./ServiceRequestForm";
 import {
   defaultBeforeAfterItems,
@@ -55,7 +56,7 @@ const settingKeys = [
   "maintenance_faq_items",
   "maintenance_final_cta_title",
   "maintenance_final_cta_text",
-  "contact_phone",
+  ...CONTACT_SETTING_KEYS,
 ];
 
 async function getMaintenanceSettings() {
@@ -74,17 +75,6 @@ async function getMaintenanceSettings() {
   }
 
   return map;
-}
-
-function getWhatsappHref(phone?: string) {
-  const digits = phone?.replace(/\D/g, "") || "";
-
-  if (!digits) {
-    return "/contact";
-  }
-
-  const normalized = digits.startsWith("90") ? digits : digits.startsWith("0") ? `9${digits}` : digits;
-  return `https://wa.me/${normalized}`;
 }
 
 function LineIcon({ path, className = "h-6 w-6" }: { path: string; className?: string }) {
@@ -110,7 +100,8 @@ export const metadata = {
 
 export default async function MaintenancePage() {
   const settings = await getMaintenanceSettings();
-  const whatsappHref = getWhatsappHref(settings.contact_phone);
+  const contactInfo = resolveContactInfo(settings);
+  const whatsappHref = getWhatsappHref(contactInfo.whatsapp || contactInfo.phone);
   const whatsappProps = whatsappHref.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {};
   const heroImage = settings.maintenance_hero_image || defaultMaintenanceText.heroImage;
   const services = parseSettingJson(settings.maintenance_services, defaultServices);
@@ -245,21 +236,29 @@ export default async function MaintenancePage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {serviceProjects.map((project) => (
-              <article key={project.title} className="overflow-hidden rounded-2xl border border-zinc-200 bg-[#f5f7f8] shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-xl hover:shadow-cyan-950/10">
+            {serviceProjects.map((project, index) => {
+              const deviceType = project.deviceType || project.title || "Servis Uygulaması";
+              const serviceType = project.serviceType || project.process || "Servis işlemi";
+              const brandModel = [project.brand, project.model].filter(Boolean).join(" / ");
+
+              return (
+              <article key={`${deviceType}-${project.brand || ""}-${project.model || ""}-${index}`} className="overflow-hidden rounded-2xl border border-zinc-200 bg-[#f5f7f8] shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-xl hover:shadow-cyan-950/10">
                 <div className="relative h-64 overflow-hidden bg-zinc-900">
-                  <FillImage src={project.image} alt={`${project.title} servis fotoğraf alanı`} sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover opacity-85 transition-transform duration-500 hover:scale-105" />
+                  <FillImage src={project.image} alt={`${deviceType} servis fotoğraf alanı`} sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover opacity-85 transition-transform duration-500 hover:scale-105" />
                   <div className="absolute left-4 top-4 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
                     {project.status}
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-black tracking-tight text-zinc-950">{project.title}</h3>
-                  <p className="mt-4 text-sm font-bold uppercase tracking-[0.18em] text-cyan-700">İşlem: {project.process}</p>
+                  <h3 className="text-2xl font-black tracking-tight text-zinc-950">{deviceType}</h3>
+                  {brandModel && <p className="mt-2 text-sm font-semibold text-zinc-500">{brandModel}</p>}
+                  <p className="mt-4 text-sm font-bold uppercase tracking-[0.18em] text-cyan-700">İşlem: {serviceType}</p>
+                  {project.serviceDate && <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-zinc-500">Servis Tarihi: {project.serviceDate}</p>}
                   <p className="mt-4 text-sm leading-6 text-zinc-600">{project.description}</p>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

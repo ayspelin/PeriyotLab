@@ -7,6 +7,7 @@ type SettingsState = {
   footer_text: string;
   contact_email: string;
   contact_phone: string;
+  contact_whatsapp: string;
   contact_address: string;
   contact_office_name: string;
   contact_working_hours: string;
@@ -29,6 +30,7 @@ const defaultSettings: SettingsState = {
   footer_text: '',
   contact_email: '',
   contact_phone: '',
+  contact_whatsapp: '',
   contact_address: '',
   contact_office_name: '',
   contact_working_hours: '',
@@ -245,6 +247,16 @@ export default function SettingsAdmin() {
               />
             </div>
             <div>
+              <label className={labelClass}>WhatsApp</label>
+              <input
+                type="text"
+                className={inputClass}
+                value={settings.contact_whatsapp}
+                onChange={(e) => updateSetting('contact_whatsapp', e.target.value)}
+                placeholder="+90 5XX XXX XX XX"
+              />
+            </div>
+            <div>
               <label className={labelClass}>Ofis veya Şube Adı</label>
               <input
                 type="text"
@@ -256,12 +268,12 @@ export default function SettingsAdmin() {
             </div>
             <div>
               <label className={labelClass}>Çalışma Saatleri</label>
-              <input
-                type="text"
-                className={inputClass}
+              <textarea
+                rows={3}
+                className={`${inputClass} resize-none`}
                 value={settings.contact_working_hours}
                 onChange={(e) => updateSetting('contact_working_hours', e.target.value)}
-                placeholder="Pazartesi - Cuma, 09:00 - 18:00"
+                placeholder={"Pazartesi - Cumartesi\n09:00 - 18:00\nPazar Kapalı"}
               />
             </div>
             <div className="md:col-span-2">
@@ -271,7 +283,7 @@ export default function SettingsAdmin() {
                 className={`${inputClass} resize-none`}
                 value={settings.contact_address}
                 onChange={(e) => updateSetting('contact_address', e.target.value)}
-                placeholder="ANITTEPE MAH. IŞIK SOKAK NO:25/A ÇANKAYA-ANKARA"
+                placeholder={"ANITTEPE MAH. IŞIK SOKAK NO:25/A\nÇANKAYA / ANKARA"}
               />
             </div>
           </div>

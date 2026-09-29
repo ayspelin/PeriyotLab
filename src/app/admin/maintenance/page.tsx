@@ -101,11 +101,14 @@ const emptyService: MaintenanceService = {
 };
 
 const emptyProject: MaintenanceServiceProject = {
-  title: "Yeni Servis Uygulaması",
-  process: "Yapılan işlem",
+  image: "/mock/prod4.png",
+  deviceType: "Yeni Servis Uygulaması",
+  brand: "",
+  model: "",
+  serviceType: "Yapılan işlem",
   description: "Kısa açıklama",
   status: "Servis Tamamlandı",
-  image: "/mock/prod4.png",
+  serviceDate: "",
 };
 
 const emptyFaq: MaintenanceFaqItem = {
@@ -488,15 +491,18 @@ export default function MaintenanceAdminPage() {
 
           <div className="mt-6 space-y-5">
             {settings.serviceProjects.map((project, index) => (
-              <div key={`${project.title}-${index}`} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div key={`${project.deviceType || project.title}-${index}`} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <h3 className="font-black text-slate-950">Uygulama {index + 1}</h3>
                   <RemoveButton onClick={() => updateSetting("serviceProjects", settings.serviceProjects.filter((_, itemIndex) => itemIndex !== index))} />
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <input className={smallInputClass} value={project.title} onChange={(event) => updateProject(index, { title: event.target.value })} placeholder="Cihaz adı" />
-                  <input className={smallInputClass} value={project.status} onChange={(event) => updateProject(index, { status: event.target.value })} placeholder="Durum" />
-                  <input className={smallInputClass} value={project.process} onChange={(event) => updateProject(index, { process: event.target.value })} placeholder="Yapılan işlem" />
+                  <input className={smallInputClass} value={project.deviceType || project.title || ""} onChange={(event) => updateProject(index, { deviceType: event.target.value })} placeholder="Cihaz türü / adı" />
+                  <input className={smallInputClass} value={project.status || ""} onChange={(event) => updateProject(index, { status: event.target.value })} placeholder="Durum" />
+                  <input className={smallInputClass} value={project.brand || ""} onChange={(event) => updateProject(index, { brand: event.target.value })} placeholder="Marka" />
+                  <input className={smallInputClass} value={project.model || ""} onChange={(event) => updateProject(index, { model: event.target.value })} placeholder="Model" />
+                  <input className={smallInputClass} value={project.serviceType || project.process || ""} onChange={(event) => updateProject(index, { serviceType: event.target.value })} placeholder="Yapılan işlem" />
+                  <input className={smallInputClass} value={project.serviceDate || ""} onChange={(event) => updateProject(index, { serviceDate: event.target.value })} placeholder="Servis tarihi (opsiyonel)" />
                   <textarea rows={3} className={`${smallInputClass} resize-none`} value={project.description} onChange={(event) => updateProject(index, { description: event.target.value })} placeholder="Kısa açıklama" />
                 </div>
                 <div className="mt-4">

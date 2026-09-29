@@ -5,11 +5,16 @@ export type MaintenanceService = {
 };
 
 export type MaintenanceServiceProject = {
-  title: string;
-  process: string;
+  image: string;
+  deviceType: string;
+  brand: string;
+  model: string;
+  serviceType: string;
   description: string;
   status: string;
-  image: string;
+  serviceDate?: string;
+  title?: string;
+  process?: string;
 };
 
 export type MaintenanceProcessStep = {
@@ -107,25 +112,31 @@ export const defaultDeviceCategories = [
 
 export const defaultServiceProjects: MaintenanceServiceProject[] = [
   {
-    title: "Laboratuvar Etüvü",
-    process: "Isıtma problemi tespiti ve bakım",
+    image: "/mock/prod4.png",
+    deviceType: "Laboratuvar Etüvü",
+    brand: "Memmert",
+    model: "UN Serisi",
+    serviceType: "Isıtma problemi tespiti ve bakım",
     description: "Isıtma davranışı, bağlantılar ve genel çalışma durumu kontrol edilerek servis süreci tamamlanır.",
     status: "Servis Tamamlandı",
-    image: "/mock/prod4.png",
   },
   {
-    title: "İnkübatör",
-    process: "Genel bakım ve performans kontrolü",
-    description: "Cihazın çalışma sürekliliğini etkileyen noktalar incelenir, bakım sonrası kontrol adımları uygulanır.",
-    status: "Servis Tamamlandı",
     image: "/mock/prod2.png",
+    deviceType: "İnkübatör",
+    brand: "Nüve",
+    model: "EN Serisi",
+    serviceType: "Genel bakım ve performans kontrolü",
+    description: "Cihazın çalışma sürekliliğini etkileyen noktalar incelenir, bakım sonrası kontrol adımları uygulanır.",
+    status: "Bakım Tamamlandı",
   },
   {
-    title: "Santrifüj",
-    process: "Mekanik bakım",
-    description: "Hareketli parçalar, çalışma dengesi ve güvenli kullanım için gerekli kontroller değerlendirilir.",
-    status: "Servis Tamamlandı",
     image: "/mock/prod3.png",
+    deviceType: "Santrifüj",
+    brand: "Hettich",
+    model: "Universal",
+    serviceType: "Mekanik bakım",
+    description: "Hareketli parçalar, çalışma dengesi ve güvenli kullanım için gerekli kontroller değerlendirilir.",
+    status: "Onarım Tamamlandı",
   },
 ];
 

@@ -1,14 +1,34 @@
 import Link from 'next/link';
 import prisma from "@/lib/prisma";
+import {
+  CONTACT_SETTING_KEYS,
+  getWhatsappHref,
+  resolveContactInfo,
+  type ContactSettings,
+} from "@/lib/contactInfo";
 
 export default async function Footer() {
   let footerText = "Modern Endüstri İçin Gelişmiş Kimyasal Çözümler";
+  const contactSettings: ContactSettings = {};
+
   try {
-    const setting = await prisma.siteSetting.findUnique({ where: { key: 'footer_text' } });
-    if (setting && setting.value) {
-      footerText = setting.value;
-    }
-  } catch(e) {}
+    const settings = await prisma.siteSetting.findMany({
+      where: { key: { in: ["footer_text", ...CONTACT_SETTING_KEYS] } },
+    });
+
+    settings.forEach((setting) => {
+      if (setting.key === "footer_text" && setting.value) {
+        footerText = setting.value;
+        return;
+      }
+
+      contactSettings[setting.key as keyof ContactSettings] = setting.value;
+    });
+  } catch {}
+
+  const contactInfo = resolveContactInfo(contactSettings);
+  const whatsappHref = getWhatsappHref(contactInfo.whatsapp || contactInfo.phone);
+  const whatsappProps = whatsappHref.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {};
 
   return (
     <footer className="w-full bg-zinc-950 text-zinc-300 py-16 mt-auto border-t border-zinc-900">
@@ -27,6 +47,31 @@ export default async function Footer() {
           <Link href="/products" className="hover:text-white transition-colors">Ürünler</Link>
           <Link href="/bakim-onarim" className="hover:text-white transition-colors">Bakım Onarım</Link>
           <Link href="/contact" className="hover:text-white transition-colors">İletişim</Link>
+        </div>
+
+        <div className="mb-12 grid w-full max-w-4xl grid-cols-1 gap-6 text-sm leading-6 text-zinc-400 md:grid-cols-3">
+          <div>
+            <h3 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-zinc-500">Adres</h3>
+            <p className="whitespace-pre-line">{contactInfo.address}</p>
+          </div>
+          <div>
+            <h3 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-zinc-500">İletişim</h3>
+            <p>
+              <a href={`mailto:${contactInfo.email}`} className="hover:text-white transition-colors">{contactInfo.email}</a>
+              {contactInfo.phone ? (
+                <>
+                  <br />
+                  <a href={`tel:${contactInfo.phone.replace(/\s+/g, "")}`} className="hover:text-white transition-colors">{contactInfo.phone}</a>
+                  <br />
+                  <a href={whatsappHref} {...whatsappProps} className="hover:text-white transition-colors">WhatsApp</a>
+                </>
+              ) : null}
+            </p>
+          </div>
+          <div>
+            <h3 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-zinc-500">Çalışma Saatleri</h3>
+            <p className="whitespace-pre-line">{contactInfo.workingHours}</p>
+          </div>
         </div>
         
         {/* Copyright */}
