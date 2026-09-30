@@ -52,12 +52,12 @@ export async function POST(request: Request) {
     const description = getString(body.description);
 
     if (!title) return validationError("Başlık zorunludur.", "title");
-    if (!slug) return validationError("Slug oluşturulamadı.", "slug");
+    if (!slug) return validationError("Sayfa adresi oluşturulamadı.", "slug");
     if (!shortDescription) return validationError("Kısa açıklama zorunludur.", "shortDescription");
     if (!description) return validationError("Detaylı açıklama zorunludur.", "description");
 
     if (!(await isSlugAvailable(slug))) {
-      return validationError("Bu slug kullanılıyor. Lütfen farklı bir slug girin.", "slug");
+      return validationError("Bu sayfa adresi kullanılıyor. Lütfen farklı bir sayfa adresi girin.", "slug");
     }
 
     const item = await prisma.customManufacturingItem.create({

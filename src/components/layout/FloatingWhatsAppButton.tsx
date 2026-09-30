@@ -38,16 +38,13 @@ export default async function FloatingWhatsAppButton() {
   const settings = await getContactSettings();
   const contactInfo = resolveContactInfo(settings);
   const href = getWhatsappHref(contactInfo.whatsapp || contactInfo.phone, FLOATING_WHATSAPP_MESSAGE);
-
-  if (!href.startsWith("https://wa.me/")) {
-    return null;
-  }
+  const isWhatsappLink = href.startsWith("https://wa.me/");
 
   return (
     <a
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={isWhatsappLink ? "_blank" : undefined}
+      rel={isWhatsappLink ? "noopener noreferrer" : undefined}
       aria-label="WhatsApp ile iletişime geç"
       className="group fixed bottom-4 right-4 z-[70] inline-flex items-center rounded-full bg-[#25D366] p-3.5 text-white shadow-lg shadow-emerald-900/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1ebe5d] hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-emerald-200 sm:bottom-6 sm:right-6 md:p-4"
     >

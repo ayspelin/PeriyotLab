@@ -1,6 +1,8 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import DeleteCustomManufacturingItemButton from "@/components/admin/DeleteCustomManufacturingItemButton";
+import ToggleCustomManufacturingFeaturedButton from "@/components/admin/ToggleCustomManufacturingFeaturedButton";
+import ToggleCustomManufacturingVisibilityButton from "@/components/admin/ToggleCustomManufacturingVisibilityButton";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +63,7 @@ export default async function AdminCustomManufacturingPage() {
                   {item.featured && (
                     <span className="rounded-lg bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-800">Ana sayfada görünür</span>
                   )}
-                  <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">/{item.slug}</span>
+                  <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">Sayfa adresi: /{item.slug}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-2 sm:flex-row md:justify-end">
@@ -73,6 +75,8 @@ export default async function AdminCustomManufacturingPage() {
                 <Link href={`/admin/custom-manufacturing/${item.id}/edit`} className="inline-flex justify-center rounded-lg bg-slate-950 px-5 py-3 text-base font-bold text-white transition hover:bg-cyan-700">
                   Düzenle
                 </Link>
+                <ToggleCustomManufacturingVisibilityButton id={item.id} title={item.title} published={item.published} />
+                <ToggleCustomManufacturingFeaturedButton id={item.id} title={item.title} featured={item.featured} />
                 <DeleteCustomManufacturingItemButton id={item.id} title={item.title} />
               </div>
             </div>

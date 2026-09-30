@@ -24,6 +24,9 @@ type SettingsState = {
   home_stat_3_label: string;
   home_stat_4_value: string;
   home_stat_4_label: string;
+  home_solution_1_image: string;
+  home_solution_2_image: string;
+  home_solution_3_image: string;
 };
 
 const defaultSettings: SettingsState = {
@@ -47,16 +50,92 @@ const defaultSettings: SettingsState = {
   home_stat_3_label: '',
   home_stat_4_value: '',
   home_stat_4_label: '',
+  home_solution_1_image: '',
+  home_solution_2_image: '',
+  home_solution_3_image: '',
 };
 
 const inputClass = "w-full rounded-lg border border-slate-300 bg-white p-4 text-base text-slate-900 outline-none transition focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100";
+const smallInputClass = "w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100";
 const labelClass = "mb-2 block text-base font-semibold text-slate-700";
 const sectionClass = "rounded-lg border border-slate-200 bg-white p-6 shadow-sm";
+
+function ImageSettingField({
+  label,
+  value,
+  fallback,
+  uploading,
+  onChange,
+  onUpload,
+  onClear,
+}: {
+  label: string;
+  value: string;
+  fallback: string;
+  uploading: boolean;
+  onChange: (value: string) => void;
+  onUpload: (file: File) => void;
+  onClear: () => void;
+}) {
+  const preview = value || fallback;
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <label className={labelClass}>{label}</label>
+      <div className="grid gap-4 md:grid-cols-[180px_1fr]">
+        <div className="h-32 overflow-hidden rounded-lg border border-slate-200 bg-white">
+          {preview ? (
+            <img src={preview} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-400">Görsel yok</div>
+          )}
+        </div>
+        <div className="space-y-3">
+          <input
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            className={smallInputClass}
+            placeholder={fallback}
+          />
+          <div className="flex flex-wrap gap-2">
+            <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-800 transition hover:border-cyan-400 hover:text-cyan-800">
+              {uploading ? "Yükleniyor..." : "Görsel Yükle"}
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                disabled={uploading}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = "";
+                  if (file) onUpload(file);
+                }}
+              />
+            </label>
+            {value && (
+              <button
+                type="button"
+                onClick={onClear}
+                className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700 transition hover:bg-rose-100"
+              >
+                Varsayılana Dön
+              </button>
+            )}
+          </div>
+          <p className="text-xs font-semibold leading-5 text-slate-500">
+            Boş bırakılırsa hazır görsel kullanılır. Değişikliği yayınlamak için alttaki Kaydet düğmesine basın.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function SettingsAdmin() {
   const [settings, setSettings] = useState<SettingsState>(defaultSettings);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [uploadingKey, setUploadingKey] = useState("");
 
   useEffect(() => {
     fetch('/api/settings')
@@ -70,6 +149,30 @@ export default function SettingsAdmin() {
   const updateSetting = (key: keyof SettingsState, value: string) => {
     setSaved(false);
     setSettings((current) => ({ ...current, [key]: value }));
+  };
+
+  const uploadImage = async (file: File, key: keyof SettingsState) => {
+    setUploadingKey(key);
+    setSaved(false);
+
+    const data = new FormData();
+    data.append('file', file);
+
+    try {
+      const response = await fetch('/api/upload', { method: 'POST', body: data });
+      const result = await response.json();
+
+      if (!response.ok || !result.success || !result.url) {
+        alert(result.error || 'Görsel yüklenemedi.');
+        return;
+      }
+
+      updateSetting(key, result.url);
+    } catch {
+      alert('Görsel yüklenemedi.');
+    } finally {
+      setUploadingKey("");
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -146,6 +249,46 @@ export default function SettingsAdmin() {
                 placeholder="PeriyotLab; ürün tedariki, servis desteği ve laboratuvar ihtiyaçları için yanınızdadır."
               />
             </div>
+          </div>
+        </section>
+
+        <section className={sectionClass}>
+          <div className="mb-6">
+            <span className="text-sm font-bold text-cyan-700">Ana Sayfa</span>
+            <h2 className="mt-2 text-xl font-black text-slate-950">Çözümlerimiz Kart Görselleri</h2>
+            <p className="mt-2 text-base leading-7 text-slate-600">
+              Ana sayfada görünen “Bakım ve Onarım Servisi”, “Teknik Destek” ve “Ürün Tedariki” kartlarının görselleri.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <ImageSettingField
+              label="Bakım ve Onarım Servisi Görseli"
+              value={settings.home_solution_1_image}
+              fallback="/mock/prod4.png"
+              uploading={uploadingKey === 'home_solution_1_image'}
+              onChange={(value) => updateSetting('home_solution_1_image', value)}
+              onUpload={(file) => uploadImage(file, 'home_solution_1_image')}
+              onClear={() => updateSetting('home_solution_1_image', '')}
+            />
+            <ImageSettingField
+              label="Teknik Destek Görseli"
+              value={settings.home_solution_2_image}
+              fallback="/mock/prod3.png"
+              uploading={uploadingKey === 'home_solution_2_image'}
+              onChange={(value) => updateSetting('home_solution_2_image', value)}
+              onUpload={(file) => uploadImage(file, 'home_solution_2_image')}
+              onClear={() => updateSetting('home_solution_2_image', '')}
+            />
+            <ImageSettingField
+              label="Ürün Tedariki Görseli"
+              value={settings.home_solution_3_image}
+              fallback="/mock/prod1.png"
+              uploading={uploadingKey === 'home_solution_3_image'}
+              onChange={(value) => updateSetting('home_solution_3_image', value)}
+              onUpload={(file) => uploadImage(file, 'home_solution_3_image')}
+              onClear={() => updateSetting('home_solution_3_image', '')}
+            />
           </div>
         </section>
 
@@ -345,7 +488,7 @@ export default function SettingsAdmin() {
         <div className="sticky bottom-4 z-10 flex justify-end">
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || Boolean(uploadingKey)}
             className="rounded-lg bg-cyan-600 px-8 py-4 text-lg font-black text-white shadow-xl shadow-cyan-900/20 transition hover:-translate-y-0.5 hover:bg-slate-950 disabled:opacity-50"
           >
             {saving ? 'Kaydediliyor...' : 'Ayarları Kaydet'}

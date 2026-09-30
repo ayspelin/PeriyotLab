@@ -50,7 +50,7 @@ export default function MobileMenu({ session }: { session: Session | null }) {
       {/* Full Screen Overlay Menu */}
       {isOpen && (
         <div 
-          className="fixed left-0 top-[80px] w-screen h-[calc(100dvh-80px)] z-40 bg-white border-t border-zinc-100"
+          className="fixed left-0 top-[80px] z-[90] h-[calc(100dvh-80px)] w-screen bg-white border-t border-zinc-100"
         >
           <div className="flex flex-col p-8 space-y-8 text-lg font-bold uppercase tracking-widest text-zinc-500 h-full overflow-y-auto">
             <Link href="/" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/' ? 'text-black' : ''}`}>Ana Sayfa</Link>
@@ -58,7 +58,6 @@ export default function MobileMenu({ session }: { session: Session | null }) {
             <Link href="/products" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/products' ? 'text-black' : ''}`}>Ürünler</Link>
             <Link href="/ozel-imalat" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/ozel-imalat' ? 'text-black' : ''}`}>Özel İmalat</Link>
             <Link href="/bakim-onarim" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/bakim-onarim' ? 'text-black' : ''}`}>Bakım Onarım</Link>
-            <Link href="/servis-takip" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/servis-takip' ? 'text-black' : ''}`}>Servis Takip</Link>
             <Link href="/contact" onClick={closeMenu} className={`hover:text-black transition-colors ${pathname === '/contact' ? 'text-black' : ''}`}>İletişim</Link>
             
             <div className="pt-8 border-t border-zinc-100 mt-auto pb-8">

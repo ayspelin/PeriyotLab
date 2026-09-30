@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
+import { isProductHidden, setProductHidden } from "@/lib/productVisibility";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const product = await prisma.product.findUnique({ where: { id } });
     if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    return NextResponse.json(product);
+    return NextResponse.json({ ...product, hidden: await isProductHidden(id) });
   } catch {
     return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
   }
@@ -21,6 +22,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   try {
     const body = await request.json();
+    const existing = await prisma.product.findUnique({ where: { id }, select: { id: true } });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
     const data: Prisma.ProductUpdateInput = {};
 
     if (body.name !== undefined) data.name = body.name;
@@ -31,12 +38,20 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     if (body.documentTitle !== undefined) data.documentTitle = body.documentTitle || null;
     if (body.documentType !== undefined) data.documentType = body.documentType || null;
     if (body.isFeatured !== undefined) data.isFeatured = body.isFeatured;
+    if (body.hidden !== undefined) await setProductHidden(id, body.hidden === true);
 
-    const product = await prisma.product.update({
-      where: { id },
-      data
-    });
-    return NextResponse.json(product);
+    const product = Object.keys(data).length > 0
+      ? await prisma.product.update({
+          where: { id },
+          data
+        })
+      : await prisma.product.findUnique({ where: { id } });
+
+    if (!product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ ...product, hidden: await isProductHidden(id) });
   } catch (error) {
     const details = error instanceof Error ? error.message : "Unknown error";
     console.error("PUT Error:", error);

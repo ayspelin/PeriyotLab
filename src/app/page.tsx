@@ -3,14 +3,6 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import PartnersSection from "@/components/home/PartnersSection";
 
-type HomeProduct = {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  imageUrl: string | null;
-};
-
 type HomeHeroSlide = {
   id: string;
   imageUrl: string;
@@ -34,7 +26,7 @@ type HomeCustomManufacturingItem = {
 };
 
 type FeaturedContent = {
-  type: "CUSTOM_MANUFACTURING" | "PRODUCT";
+  type: "CUSTOM_MANUFACTURING";
   title: string;
   image: string | null;
   description: string;
@@ -57,6 +49,9 @@ const settingKeys = [
   "home_stat_3_label",
   "home_stat_4_value",
   "home_stat_4_label",
+  "home_solution_1_image",
+  "home_solution_2_image",
+  "home_solution_3_image",
 ];
 
 const serviceCards = [
@@ -84,34 +79,35 @@ const serviceCards = [
 
 const solutionCards = [
   {
-    title: "Analitik Kimyasallar",
-    description: "Sertifikalı reaktifler, tampon çözeltiler ve kromatografi solventleri.",
-    image: "/mock/prod1.png",
+    title: "Bakım ve Onarım Servisi",
+    description: "Laboratuvar cihazları için arıza tespiti, bakım planı, onarım ve servis talebi tek akışta yönetilir.",
+    imageKey: "home_solution_1_image",
+    fallbackImage: "/mock/prod4.png",
+    href: "/bakim-onarim",
+    featured: true,
   },
   {
-    title: "Laboratuvar Sarfları",
-    description: "Günlük kullanım için güvenilir cam malzeme, sarf ve destek ürünleri.",
-    image: "/mock/prod2.png",
+    title: "Teknik Destek",
+    description: "Cihaz durumu, parça ihtiyacı ve süreç yönlendirmesi için ulaşılabilir destek.",
+    imageKey: "home_solution_2_image",
+    fallbackImage: "/mock/prod3.png",
+    href: "/bakim-onarim",
   },
   {
-    title: "Bakım ve Onarım",
-    description: "Cihaz bakımı, arıza takibi ve periyodik servis ihtiyaçları için net hizmet akışı.",
-    image: "/mock/prod4.png",
+    title: "Ürün Tedariki",
+    description: "Servis ve laboratuvar süreçlerini destekleyen ürün ve sarf tedariki.",
+    imageKey: "home_solution_3_image",
+    fallbackImage: "/mock/prod1.png",
+    href: "/products",
   },
 ];
 
 export default async function Home() {
-  let featuredProducts: HomeProduct[] = [];
   let featuredCustomItems: HomeCustomManufacturingItem[] = [];
   let heroSlides: HomeHeroSlide[] = [];
   let partners: HomePartner[] = [];
   const settings: Record<string, string> = {};
   try {
-    const dbFeaturedProducts = await prisma.product.findMany({
-      where: { isFeatured: true },
-      orderBy: { createdAt: 'desc' }
-    });
-    featuredProducts = dbFeaturedProducts;
     featuredCustomItems = await prisma.customManufacturingItem.findMany({
       where: {
         featured: true,
@@ -155,15 +151,6 @@ export default async function Home() {
       href: `/ozel-imalat/${item.slug}`,
       createdAt: item.createdAt,
     })),
-    ...featuredProducts.map((product) => ({
-      type: "PRODUCT" as const,
-      title: product.name,
-      image: product.imageUrl,
-      description: product.description,
-      badge: "Ürün",
-      href: `/products/${product.id}`,
-      createdAt: new Date(),
-    })),
   ].slice(0, 6);
 
   const stats = [
@@ -184,6 +171,10 @@ export default async function Home() {
       label: settings.home_stat_4_label || "laboratuvar desteği",
     },
   ];
+  const homeSolutionCards = solutionCards.map((card) => ({
+    ...card,
+    image: settings[card.imageKey] || card.fallbackImage,
+  }));
 
   return (
     <div className="flex flex-col w-full bg-[#f5f7f8] text-zinc-950">
@@ -251,23 +242,23 @@ export default async function Home() {
               <span className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-700">Çözümlerimiz</span>
               <h2 className="mt-3 text-3xl md:text-5xl font-black text-zinc-950 tracking-tight">Katalogdan daha fazlası.</h2>
               <p className="mt-4 text-zinc-600 text-lg leading-relaxed">
-                Laboratuvarın günlük akışında ürün, servis ve teknik bilgiye hızlı ulaşmak için sadeleştirilmiş başlıklar.
-              </p>
-            </div>
-            <Link href="/products" className="inline-flex items-center gap-3 rounded-full bg-zinc-950 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-cyan-700">
-              Ürünleri İncele
+              Laboratuvarın günlük akışında servis, teknik destek ve gerekli ürün bilgilerine hızlı ulaşmak için sadeleştirilmiş başlıklar.
+            </p>
+          </div>
+            <Link href="/bakim-onarim" className="inline-flex items-center gap-3 rounded-full bg-zinc-950 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-cyan-700">
+              Servis Talebi Oluştur
               <span aria-hidden="true">→</span>
             </Link>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {solutionCards.map((card) => (
-              <Link key={card.title} href={card.title === "Bakım ve Onarım" ? "/bakim-onarim" : "/products"} className="group relative min-h-[360px] overflow-hidden rounded-2xl bg-zinc-950 text-white shadow-xl shadow-zinc-950/10">
+            {homeSolutionCards.map((card) => (
+              <Link key={card.title} href={card.href} className={`group relative overflow-hidden rounded-2xl bg-zinc-950 text-white shadow-xl shadow-zinc-950/10 ${card.featured ? "min-h-[430px] lg:col-span-2" : "min-h-[360px]"}`}>
                 <img src={card.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-70 transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10" />
-                <div className="relative z-10 flex min-h-[360px] flex-col justify-end p-7">
-                  <h3 className="text-2xl font-black tracking-tight">{card.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/80">{card.description}</p>
+                <div className={`relative z-10 flex flex-col justify-end p-7 ${card.featured ? "min-h-[430px] md:p-9" : "min-h-[360px]"}`}>
+                  <h3 className={`font-black tracking-tight ${card.featured ? "text-3xl md:text-5xl" : "text-2xl"}`}>{card.title}</h3>
+                  <p className={`mt-3 leading-6 text-white/80 ${card.featured ? "max-w-2xl text-base md:text-lg md:leading-8" : "text-sm"}`}>{card.description}</p>
                   <div className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">
                     Detayları Gör <span aria-hidden="true">→</span>
                   </div>
@@ -283,9 +274,9 @@ export default async function Home() {
           <div className="container mx-auto px-4">
             <div className="mb-16 max-w-3xl">
               <span className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-700">Öne Çıkanlar</span>
-              <h2 className="mt-3 text-3xl md:text-5xl font-black text-zinc-950 mb-4 tracking-tight">PeriyotLab’dan Öne Çıkanlar</h2>
+              <h2 className="mt-3 text-3xl md:text-5xl font-black text-zinc-950 mb-4 tracking-tight">Öne Çıkan Özel Çalışmalar</h2>
               <p className="text-zinc-600 text-lg leading-relaxed">
-                Özel imalat çalışmalarımızı, laboratuvar çözümlerimizi ve seçili ürünleri keşfedin.
+                Özel imalat çalışmalarımızı ve laboratuvar süreçlerine göre hazırlanan çözümleri keşfedin.
               </p>
             </div>
 
@@ -321,13 +312,13 @@ export default async function Home() {
           <div className="overflow-hidden rounded-2xl bg-zinc-950 p-8 text-white shadow-2xl shadow-cyan-950/10 md:p-12">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
-                <h2 className="text-3xl font-black tracking-tight md:text-5xl">Standart Ürünler İhtiyacınızı Karşılamıyor mu?</h2>
+                <h2 className="text-3xl font-black tracking-tight md:text-5xl">Cihazınız için servis desteği mi gerekiyor?</h2>
                 <p className="mt-5 max-w-3xl text-lg leading-8 text-zinc-300">
-                  Uygulamanıza özel cihaz ve sistem ihtiyaçlarınız için PeriyotLab özel imalat çözümlerini inceleyin.
+                  Bakım, arıza tespiti ve onarım ihtiyacınızı bize iletin; teknik ekip süreci net bir şekilde değerlendirsin.
                 </p>
               </div>
-              <Link href="/ozel-imalat" className="inline-flex justify-center rounded-full bg-cyan-300 px-7 py-4 text-base font-black text-zinc-950 transition hover:bg-white">
-                Özel İmalatı İncele
+              <Link href="/bakim-onarim#servis-talep-formu" className="inline-flex justify-center rounded-full bg-cyan-300 px-7 py-4 text-base font-black text-zinc-950 transition hover:bg-white">
+                Servis Talebi Oluştur
               </Link>
             </div>
           </div>
@@ -366,7 +357,7 @@ export default async function Home() {
             <div className="space-y-4">
               {[
                 "Ürün ve servis bilgilerini aynı akışta yönetme",
-                "Öne çıkan ürünleri ve bannerları panelden güncelleme",
+                "Servis taleplerini anlaşılır şekilde yönlendirme",
                 "Bakım onarım anlatımını kolayca güncelleme",
                 "İletişim ve kurumsal metinleri hızlıca düzenleme",
               ].map((item) => (

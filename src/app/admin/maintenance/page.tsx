@@ -169,13 +169,20 @@ function ImageUploadField({
   uploading,
   onChange,
   onUpload,
+  onClear,
 }: {
   label: string;
   value: string;
   uploading: boolean;
   onChange: (value: string) => void;
   onUpload: (file: File) => void;
+  onClear?: () => void;
 }) {
+  const clearImage = () => {
+    if (!confirm("Bu görseli kaldırmak istediğinize emin misiniz?")) return;
+    onClear?.();
+  };
+
   return (
     <div className="space-y-3">
       <label className={labelClass}>{label}</label>
@@ -203,6 +210,11 @@ function ImageUploadField({
               }}
             />
           </label>
+          {value && (
+            <button type="button" onClick={clearImage} className="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700 transition hover:bg-rose-100">
+              Görseli Sil
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -401,6 +413,7 @@ export default function MaintenanceAdminPage() {
               uploading={uploadingKey === "hero"}
               onChange={(value) => updateSetting("heroImage", value)}
               onUpload={(file) => uploadImage(file, "hero", (url) => updateSetting("heroImage", url))}
+              onClear={() => updateSetting("heroImage", "")}
             />
           </div>
         </SectionCard>
@@ -512,6 +525,7 @@ export default function MaintenanceAdminPage() {
                     uploading={uploadingKey === `project-${index}`}
                     onChange={(value) => updateProject(index, { image: value })}
                     onUpload={(file) => uploadImage(file, `project-${index}`, (url) => updateProject(index, { image: url }))}
+                    onClear={() => updateProject(index, { image: "" })}
                   />
                 </div>
               </div>
@@ -546,6 +560,7 @@ export default function MaintenanceAdminPage() {
                     uploading={uploadingKey === `before-after-${index}`}
                     onChange={(value) => updateBeforeAfter(index, { image: value })}
                     onUpload={(file) => uploadImage(file, `before-after-${index}`, (url) => updateBeforeAfter(index, { image: url }))}
+                    onClear={() => updateBeforeAfter(index, { image: "" })}
                   />
                 </div>
               </div>

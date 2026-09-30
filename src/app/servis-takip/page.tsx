@@ -1,10 +1,10 @@
-import ServiceTrackClient from "./ServiceTrackClient";
+import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Servis Takip | PeriyotLab",
-  description: "PeriyotLab servis takip kodunuzla cihazınızın güncel servis durumunu görüntüleyin.",
+  title: "Bakım Onarım | PeriyotLab",
+  description: "PeriyotLab bakım onarım ve teknik servis talepleri.",
 };
 
 export default function ServiceTrackPage() {
-  return <ServiceTrackClient />;
+  redirect("/bakim-onarim");
 }

@@ -30,7 +30,6 @@ export default async function Navbar() {
           <Link href="/products" className="hover:text-black transition-colors">Ürünler</Link>
           <Link href="/ozel-imalat" className="hover:text-black transition-colors">Özel İmalat</Link>
           <Link href="/bakim-onarim" className="hover:text-black transition-colors">Bakım Onarım</Link>
-          <Link href="/servis-takip" className="hover:text-black transition-colors">Servis Takip</Link>
           <Link href="/contact" className="hover:text-black transition-colors">İletişim</Link>
         </nav>
 

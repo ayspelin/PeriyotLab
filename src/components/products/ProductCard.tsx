@@ -33,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="text-sm text-zinc-500 leading-relaxed line-clamp-3 mb-8 flex-grow">{product.description}</p>
         
         <div className="mt-auto pt-4 border-t border-zinc-100 text-xs font-bold uppercase tracking-widest text-zinc-950 flex items-center">
-          Ürünü İncele <span className="ml-2 transform group-hover:translate-x-2 transition-transform">→</span>
+          Detay ve Fiyat Bilgisi <span className="ml-2 transform group-hover:translate-x-2 transition-transform">→</span>
         </div>
       </div>
     </Link>

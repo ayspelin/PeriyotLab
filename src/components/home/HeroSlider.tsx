@@ -81,8 +81,8 @@ export default function HeroSlider({ slides, badge, title, description }: HeroSl
           </p>
 
           <div className="mt-9 flex flex-col sm:flex-row gap-3">
-            <Link href="/products" className="inline-flex justify-center rounded-full bg-cyan-300 px-7 py-4 text-sm font-black text-zinc-950 transition-all hover:-translate-y-0.5 hover:bg-white">
-              Ürünleri İncele
+            <Link href="/bakim-onarim#servis-talep-formu" className="inline-flex justify-center rounded-full bg-cyan-300 px-7 py-4 text-sm font-black text-zinc-950 transition-all hover:-translate-y-0.5 hover:bg-white">
+              Servis Talebi Oluştur
             </Link>
             <Link href="/contact" className="inline-flex justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-bold text-white backdrop-blur transition-all hover:-translate-y-0.5 hover:bg-white/20">
               Uzmanla Görüş

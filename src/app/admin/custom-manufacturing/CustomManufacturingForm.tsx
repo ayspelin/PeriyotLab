@@ -194,8 +194,11 @@ export default function CustomManufacturingForm({ mode, item }: Props) {
             <input required value={formData.title} onChange={(event) => updateField("title", event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-cyan-600 focus:ring-1 focus:ring-cyan-600" />
           </label>
           <label className="space-y-2">
-            <span className="text-sm font-bold text-slate-700">Slug</span>
+            <span className="text-sm font-bold text-slate-700">Sayfa Adresi</span>
             <input required value={formData.slug} onChange={(event) => updateField("slug", createSlug(event.target.value))} className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-cyan-600 focus:ring-1 focus:ring-cyan-600" />
+            <span className="block text-xs font-semibold leading-5 text-slate-500">
+              Bu alan sayfanın bağlantı adıdır. Başlıktan otomatik oluşur; örnek: /ozel-imalat/ornek-cihaz
+            </span>
           </label>
         </div>
 

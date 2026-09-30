@@ -36,7 +36,7 @@ export const defaultMaintenanceText = {
   badge: "Teknik Servis",
   title: "Laboratuvar Cihazları Bakım & Onarım",
   intro: "Laboratuvar cihazlarınız için arıza tespiti, bakım, onarım ve teknik servis çözümleri sunuyoruz.",
-  heroImage: "/mock/hero2.png",
+  heroImage: "/uploads/maintenance/technical-service-hero.png",
   requestTitle: "Cihazınız Arızalı mı?",
   requestText: "Cihazınız çalışmıyor, hata veriyor veya beklenen performansı göstermiyor mu? Cihaz bilgilerini ve yaşadığınız problemi bize iletin. Teknik ekibimiz servis süreci hakkında sizinle iletişime geçsin.",
   requestTipTitle: "Talep için faydalı bilgiler",
@@ -121,7 +121,7 @@ export const defaultServiceProjects: MaintenanceServiceProject[] = [
     status: "Servis Tamamlandı",
   },
   {
-    image: "/mock/prod2.png",
+    image: "/uploads/maintenance/application-2-incubator-maintenance.png",
     deviceType: "İnkübatör",
     brand: "Nüve",
     model: "EN Serisi",
@@ -130,7 +130,7 @@ export const defaultServiceProjects: MaintenanceServiceProject[] = [
     status: "Bakım Tamamlandı",
   },
   {
-    image: "/mock/prod3.png",
+    image: "/uploads/maintenance/application-3-centrifuge-repair.png",
     deviceType: "Santrifüj",
     brand: "Hettich",
     model: "Universal",

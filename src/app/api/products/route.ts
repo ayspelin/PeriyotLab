@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
+import { getHiddenProductIds } from "@/lib/productVisibility";
 
 export async function GET() {
   try {
+    const hiddenProductIds = await getHiddenProductIds();
     const products = await prisma.product.findMany({
+      where: hiddenProductIds.length > 0 ? { id: { notIn: hiddenProductIds } } : undefined,
       orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(products);

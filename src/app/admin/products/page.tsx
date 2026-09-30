@@ -3,21 +3,27 @@ import prisma from "@/lib/prisma";
 
 import DeleteProductButton from '@/components/admin/DeleteProductButton';
 import DeleteProductImageButton from '@/components/admin/DeleteProductImageButton';
+import ToggleProductFeaturedButton from '@/components/admin/ToggleProductFeaturedButton';
+import ToggleProductVisibilityButton from '@/components/admin/ToggleProductVisibilityButton';
+import { getHiddenProductIds } from '@/lib/productVisibility';
 
 async function getProducts() {
   try {
-    const products = await prisma.product.findMany({
-      orderBy: { createdAt: 'desc' }
-    });
+    const [products, hiddenProductIds] = await Promise.all([
+      prisma.product.findMany({
+        orderBy: { createdAt: 'desc' }
+      }),
+      getHiddenProductIds(),
+    ]);
 
-    return { products, loaded: true };
+    return { products, hiddenProductIds, loaded: true };
   } catch {
-    return { products: [], loaded: false };
+    return { products: [], hiddenProductIds: [], loaded: false };
   }
 }
 
 export default async function AdminProductsPage() {
-  const { products, loaded } = await getProducts();
+  const { products, hiddenProductIds, loaded } = await getProducts();
 
   return (
     <div className="max-w-6xl">
@@ -41,8 +47,11 @@ export default async function AdminProductsPage() {
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        {products.map(product => (
-          <div key={product.id} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        {products.map(product => {
+          const hidden = hiddenProductIds.includes(product.id);
+
+          return (
+          <div key={product.id} className={`rounded-lg border bg-white p-5 shadow-sm ${hidden ? 'border-amber-200' : 'border-slate-200'}`}>
             <div className="grid gap-5 md:grid-cols-[72px_1fr_auto] md:items-center">
               <div className="h-[72px] w-[72px] overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
                 {product.imageUrl ? (
@@ -55,8 +64,11 @@ export default async function AdminProductsPage() {
                 <h2 className="text-xl font-black text-slate-950">{product.name}</h2>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">{product.category}</span>
+                  <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${hidden ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                    {hidden ? 'Sitede gizli' : 'Sitede yayında'}
+                  </span>
                   {product.isFeatured && (
-                    <span className="rounded-lg bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-800">Ana sayfada görünür</span>
+                    <span className="rounded-lg bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-800">Ana sayfada öne çıkar</span>
                   )}
                 </div>
               </div>
@@ -64,6 +76,8 @@ export default async function AdminProductsPage() {
                 <Link href={`/admin/products/${product.id}/edit`} className="inline-flex justify-center rounded-lg bg-slate-950 px-5 py-3 text-base font-bold text-white transition hover:bg-cyan-700">
                   Düzenle
                 </Link>
+                <ToggleProductVisibilityButton id={product.id} name={product.name} hidden={hidden} />
+                <ToggleProductFeaturedButton id={product.id} name={product.name} featured={product.isFeatured} />
                 {product.imageUrl && (
                   <DeleteProductImageButton id={product.id} name={product.name} />
                 )}
@@ -71,7 +85,8 @@ export default async function AdminProductsPage() {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
 
         {loaded && products.length === 0 && (
           <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center">

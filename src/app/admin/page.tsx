@@ -32,12 +32,6 @@ const quickActions = [
     icon: ["M14.7 6.3a4 4 0 0 0-5 5L4 17v3h3l5.7-5.7a4 4 0 0 0 5-5l-2.4 2.4-2.6-2.6 2-2.8Z"],
   },
   {
-    href: "/admin/services",
-    title: "Servis Yönetimi",
-    description: "Servis kayıtlarını oluşturun, takip kodlarını yönetin ve durum güncelleyin.",
-    icon: ["M10 2v7.3a2 2 0 0 1-.6 1.4L4.6 15.5A2 2 0 0 0 4 17v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2a2 2 0 0 0-.6-1.4l-4.8-4.9A2 2 0 0 1 14 9.3V2", "M8 2h8", "M7 17h10"],
-  },
-  {
     href: "/admin/about",
     title: "Hakkımızda",
     description: "Firma tanıtım yazılarını düzenleyin.",

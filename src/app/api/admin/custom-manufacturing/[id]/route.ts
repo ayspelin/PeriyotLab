@@ -58,12 +58,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const description = getString(body.description);
 
     if (!title) return validationError("Başlık zorunludur.", "title");
-    if (!slug) return validationError("Slug oluşturulamadı.", "slug");
+    if (!slug) return validationError("Sayfa adresi oluşturulamadı.", "slug");
     if (!shortDescription) return validationError("Kısa açıklama zorunludur.", "shortDescription");
     if (!description) return validationError("Detaylı açıklama zorunludur.", "description");
 
     if (!(await isSlugAvailable(slug, id))) {
-      return validationError("Bu slug kullanılıyor. Lütfen farklı bir slug girin.", "slug");
+      return validationError("Bu sayfa adresi kullanılıyor. Lütfen farklı bir sayfa adresi girin.", "slug");
     }
 
     const item = await prisma.customManufacturingItem.update({
@@ -88,6 +88,35 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ item });
   } catch (error) {
     console.error("[Custom Manufacturing API] Update failed:", error);
+    return NextResponse.json({ error: "Özel imalat kaydı güncellenemedi." }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
+  const { id } = await params;
+
+  try {
+    const body = (await request.json()) as Record<string, unknown>;
+    const data: { published?: boolean; featured?: boolean } = {};
+
+    if (body.published !== undefined) data.published = body.published === true;
+    if (body.featured !== undefined) data.featured = body.featured === true;
+
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json({ error: "Güncellenecek alan bulunamadı." }, { status: 400 });
+    }
+
+    const item = await prisma.customManufacturingItem.update({
+      where: { id },
+      data,
+    });
+
+    return NextResponse.json({ item });
+  } catch (error) {
+    console.error("[Custom Manufacturing API] Patch failed:", error);
     return NextResponse.json({ error: "Özel imalat kaydı güncellenemedi." }, { status: 500 });
   }
 }

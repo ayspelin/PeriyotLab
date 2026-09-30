@@ -140,9 +140,6 @@ export default async function MaintenancePage() {
               <a href="#servis-talep-formu" className="inline-flex justify-center rounded-full bg-cyan-300 px-7 py-4 text-base font-black text-zinc-950 transition hover:bg-white">
                 Servis Talebi Oluştur
               </a>
-              <Link href="/servis-takip" className="inline-flex justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-base font-bold text-white transition hover:bg-white/20">
-                Servis Takip
-              </Link>
               <a href={whatsappHref} {...whatsappProps} className="inline-flex justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-base font-bold text-white transition hover:bg-white/20">
                 WhatsApp ile İletişime Geç
               </a>
@@ -243,11 +240,16 @@ export default async function MaintenancePage() {
               const deviceType = project.deviceType || project.title || "Servis Uygulaması";
               const serviceType = project.serviceType || project.process || "Servis işlemi";
               const brandModel = [project.brand, project.model].filter(Boolean).join(" / ");
+              const image = project.image?.trim();
 
               return (
               <article key={`${deviceType}-${project.brand || ""}-${project.model || ""}-${index}`} className="overflow-hidden rounded-2xl border border-zinc-200 bg-[#f5f7f8] shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-xl hover:shadow-cyan-950/10">
                 <div className="relative h-64 overflow-hidden bg-zinc-900">
-                  <FillImage src={project.image} alt={`${deviceType} servis fotoğraf alanı`} sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover opacity-85 transition-transform duration-500 hover:scale-105" />
+                  {image ? (
+                    <FillImage src={image} alt={`${deviceType} servis fotoğraf alanı`} sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover opacity-85 transition-transform duration-500 hover:scale-105" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center p-8 text-center text-sm font-bold text-zinc-400">Görsel eklenmedi</div>
+                  )}
                   <div className="absolute left-4 top-4 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
                     {project.status}
                   </div>
@@ -292,16 +294,24 @@ export default async function MaintenancePage() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            {beforeAfterItems.map((item) => (
-              <div key={item.label} className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
-                <div className="relative h-72 overflow-hidden bg-zinc-900">
-                  <FillImage src={item.image} alt={`${item.label} görsel alanı`} sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
+            {beforeAfterItems.map((item) => {
+              const image = item.image?.trim();
+
+              return (
+                <div key={item.label} className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+                  <div className="relative h-72 overflow-hidden bg-zinc-900">
+                    {image ? (
+                      <FillImage src={image} alt={`${item.label} görsel alanı`} sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center p-8 text-center text-sm font-bold text-zinc-400">Görsel eklenmedi</div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <p className="text-sm font-black uppercase tracking-[0.18em] text-zinc-500">{item.label}</p>
+                  </div>
                 </div>
-                <div className="p-5">
-                  <p className="text-sm font-black uppercase tracking-[0.18em] text-zinc-500">{item.label}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -406,9 +416,6 @@ export default async function MaintenancePage() {
                 <a href="#servis-talep-formu" className="inline-flex justify-center rounded-full bg-cyan-300 px-7 py-4 text-base font-black text-zinc-950 transition hover:bg-white">
                   Servis Talebi Oluştur
                 </a>
-                <Link href="/servis-takip" className="inline-flex justify-center rounded-full border border-white/20 bg-white/10 px-7 py-4 text-base font-bold text-white transition hover:bg-white/20">
-                  Servis Takip
-                </Link>
                 <a href={whatsappHref} {...whatsappProps} className="inline-flex justify-center rounded-full border border-white/20 bg-white/10 px-7 py-4 text-base font-bold text-white transition hover:bg-white/20">
                   WhatsApp
                 </a>

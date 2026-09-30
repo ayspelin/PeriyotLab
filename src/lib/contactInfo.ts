@@ -90,12 +90,13 @@ export function getWhatsappNumber(phone: string) {
 
 export function getWhatsappHref(phone: string, message = DEFAULT_WHATSAPP_MESSAGE) {
   const whatsappNumber = getWhatsappNumber(phone);
+  const encodedMessage = encodeURIComponent(message);
 
   if (!whatsappNumber) {
-    return "/contact";
+    return `https://wa.me/?text=${encodedMessage}`;
   }
 
-  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 }
 
 export function getGoogleMapsHref(query: string) {

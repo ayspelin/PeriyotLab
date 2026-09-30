@@ -2,6 +2,8 @@ import Link from 'next/link';
 import prisma from "@/lib/prisma";
 
 import { notFound } from 'next/navigation';
+import { CONTACT_SETTING_KEYS, getWhatsappHref, resolveContactInfo, type ContactSettings } from "@/lib/contactInfo";
+import { isProductHidden } from "@/lib/productVisibility";
 
 const FILE_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
   pdf:   { label: 'PDF',   color: '#dc2626', bg: '#fef2f2', border: '#fecaca', icon: 'PDF' },
@@ -23,15 +25,36 @@ async function getProduct(id: string) {
   }
 }
 
+async function getContactSettings() {
+  const settings: ContactSettings = {};
+
+  try {
+    const rows = await prisma.siteSetting.findMany({
+      where: { key: { in: [...CONTACT_SETTING_KEYS] } },
+    });
+
+    rows.forEach((row) => {
+      settings[row.key as keyof ContactSettings] = row.value;
+    });
+  } catch {}
+
+  return settings;
+}
+
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { id } = await params;
   const product = await getProduct(id);
 
-  if (!product) notFound();
+  if (!product || await isProductHidden(id)) notFound();
 
   const docConfig = product.documentType
     ? FILE_TYPE_CONFIG[product.documentType] ?? FILE_TYPE_CONFIG['other']
     : null;
+  const contactInfo = resolveContactInfo(await getContactSettings());
+  const whatsappHref = getWhatsappHref(
+    contactInfo.whatsapp || contactInfo.phone,
+    `Merhaba, ${product.name} için fiyat ve ürün bilgisi almak istiyorum.`
+  );
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-4xl">
@@ -59,6 +82,29 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
           <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300">
             {product.description}
           </p>
+        </div>
+
+        <div className="mb-10 rounded-2xl border border-cyan-200 bg-cyan-50 p-6">
+          <h2 className="text-2xl font-black tracking-tight text-zinc-950">Fiyat Bilgisi</h2>
+          <p className="mt-3 text-base leading-7 text-zinc-700">
+            Güncel fiyat ve temin bilgisi için ürün adını belirterek bizimle iletişime geçebilirsiniz.
+          </p>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex justify-center rounded-full bg-zinc-950 px-7 py-4 text-base font-black text-white transition hover:bg-cyan-700"
+            >
+              Fiyat İçin İletişime Geçin
+            </a>
+            <Link
+              href="/contact"
+              className="inline-flex justify-center rounded-full border border-cyan-200 bg-white px-7 py-4 text-base font-bold text-zinc-950 transition hover:border-cyan-400 hover:text-cyan-800"
+            >
+              İletişim Formu
+            </Link>
+          </div>
         </div>
 
         {product.documentUrl && docConfig && (

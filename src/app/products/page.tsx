@@ -1,5 +1,6 @@
 import ProductCard from '@/components/products/ProductCard';
 import prisma from "@/lib/prisma";
+import { getHiddenProductIds } from "@/lib/productVisibility";
 
 type ProductListItem = {
   id: string;
@@ -15,7 +16,9 @@ export default async function ProductsPage() {
 
   try {
     // Attempt to fetch from DB
+    const hiddenProductIds = await getHiddenProductIds();
     products = await prisma.product.findMany({
+      where: hiddenProductIds.length > 0 ? { id: { notIn: hiddenProductIds } } : undefined,
       orderBy: { createdAt: 'desc' }
     });
   } catch {
@@ -33,7 +36,7 @@ export default async function ProductsPage() {
       <div className="mb-12">
         <h1 className="text-4xl font-bold mb-4 tracking-tight">Ürün Kataloğu</h1>
         <p className="text-gray-600 dark:text-gray-400 max-w-2xl text-lg">
-          Tüm kimyasal ürünlerimizi inceleyebilir, kategorilere göre filtreleyebilir ve detaylı teknik özelliklerine ulaşabilirsiniz.
+          Tüm kimyasal ürünlerimizi inceleyebilir, kategorilere göre filtreleyebilir ve fiyat bilgisi için bizimle iletişime geçebilirsiniz.
         </p>
       </div>
 
