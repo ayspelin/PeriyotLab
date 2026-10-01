@@ -1,12 +1,13 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import { SITE_NAME } from "@/lib/seo";
 import CustomManufacturingRequestForm from "./CustomManufacturingRequestForm";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Özel İmalat | PeriyotLab",
-  description: "PeriyotLab özel laboratuvar cihazı ve sistem çözümlerini inceleyin.",
+  title: `Özel İmalat | ${SITE_NAME}`,
+  description: "PeriyotLAB özel laboratuvar cihazı ve sistem çözümlerini inceleyin.",
   alternates: {
     canonical: "/ozel-imalat",
   },

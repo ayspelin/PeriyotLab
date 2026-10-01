@@ -3,10 +3,19 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FloatingWhatsAppButton from "@/components/layout/FloatingWhatsAppButton";
+import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "PeriyotLab | Laboratuvar ve Kimyasal Çözümler",
-  description: "Kimyasal ürünler, teknik dokümanlar ve laboratuvar tedarik çözümleri.",
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
+  title: {
+    default: HOME_TITLE,
+    template: "%s",
+  },
+  description: HOME_DESCRIPTION,
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 import { ConditionalFloatingAction, ConditionalHeader, ConditionalFooter } from "@/components/layout/ConditionalLayout";

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { normalizeGalleryImages, normalizeTechnicalSpecifications } from "@/lib/customManufacturing";
+import { SITE_NAME } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -21,12 +22,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!item) {
     return {
-      title: "Özel İmalat | PeriyotLab",
+      title: `Özel İmalat | ${SITE_NAME}`,
     };
   }
 
   return {
-    title: `${item.title} | Özel İmalat | PeriyotLab`,
+    title: `${item.title} | Özel İmalat | ${SITE_NAME}`,
     description: item.shortDescription,
     alternates: {
       canonical: `/ozel-imalat/${item.slug}`,

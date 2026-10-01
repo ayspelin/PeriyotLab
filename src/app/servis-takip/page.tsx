@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
+import { SITE_NAME } from "@/lib/seo";
 
 export const metadata = {
-  title: "Bakım Onarım | PeriyotLab",
-  description: "PeriyotLab bakım onarım ve teknik servis talepleri.",
+  title: `Servis Takip | ${SITE_NAME}`,
+  description: "PeriyotLAB bakım onarım ve teknik servis talepleri.",
 };
 
 export default function ServiceTrackPage() {

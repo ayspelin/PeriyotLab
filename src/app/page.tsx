@@ -2,6 +2,10 @@ import HeroSlider from "@/components/home/HeroSlider";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import PartnersSection from "@/components/home/PartnersSection";
+import { CONTACT_SETTING_KEYS, resolveContactInfo } from "@/lib/contactInfo";
+import { absoluteUrl, LOGO_IMAGE_PATH, SITE_NAME, SITE_URL, homeMetadata } from "@/lib/seo";
+
+export const metadata = homeMetadata;
 
 type HomeHeroSlide = {
   id: string;
@@ -35,6 +39,31 @@ type FeaturedContent = {
   createdAt: Date;
 };
 
+function buildOrganizationJsonLd(settings: Record<string, string>) {
+  const contactInfo = resolveContactInfo(settings);
+  const organization: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: absoluteUrl(LOGO_IMAGE_PATH),
+  };
+
+  if (contactInfo.email) {
+    organization.email = contactInfo.email;
+  }
+
+  if (contactInfo.phone) {
+    organization.telephone = contactInfo.phone;
+  }
+
+  if (contactInfo.address) {
+    organization.address = contactInfo.address.replace(/\s+/g, " ");
+  }
+
+  return organization;
+}
+
 const settingKeys = [
   "home_hero_badge",
   "home_hero_title",
@@ -52,6 +81,7 @@ const settingKeys = [
   "home_solution_1_image",
   "home_solution_2_image",
   "home_solution_3_image",
+  ...CONTACT_SETTING_KEYS,
 ];
 
 const serviceCards = [
@@ -175,9 +205,15 @@ export default async function Home() {
     ...card,
     image: settings[card.imageKey] || card.fallbackImage,
   }));
+  const organizationJsonLd = buildOrganizationJsonLd(settings);
 
   return (
-    <div className="flex flex-col w-full bg-[#f5f7f8] text-zinc-950">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c") }}
+      />
+      <div className="flex flex-col w-full bg-[#f5f7f8] text-zinc-950">
       <section className="relative w-full h-[82vh] min-h-[620px] lg:h-[88vh] overflow-hidden bg-black">
         <HeroSlider
           slides={heroSlides}
@@ -374,6 +410,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

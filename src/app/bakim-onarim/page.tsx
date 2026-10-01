@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { CONTACT_SETTING_KEYS, getWhatsappHref, resolveContactInfo } from "@/lib/contactInfo";
+import { SITE_NAME } from "@/lib/seo";
 import ServiceRequestForm from "./ServiceRequestForm";
 import {
   defaultBeforeAfterItems,
@@ -94,7 +95,7 @@ function FillImage({ src, alt, className, priority = false, sizes }: { src: stri
 }
 
 export const metadata = {
-  title: "Bakım Onarım | PeriyotLab",
+  title: `Bakım Onarım | ${SITE_NAME}`,
   description: "Laboratuvar cihazları için arıza tespiti, bakım, onarım ve teknik servis çözümleri.",
 };
 
